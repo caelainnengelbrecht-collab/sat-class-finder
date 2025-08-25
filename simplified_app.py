@@ -121,6 +121,20 @@ COURSE_CATALOG = {
         "best_for": "Reading and Writing intensive preparation", 
         "recommended_timeline": "urgent"
     },
+    "2-Week SAT Math Course": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-math-sat-9-12/dp/2f67b5be-e283-406f-b4d2-fe3fc17e52aa",
+        "description": "Two week intensive course focused on SAT Math",
+        "duration": "2 weeks",
+        "best_for": "Extended math preparation",
+        "recommended_timeline": "good"
+    },
+    "2-Week SAT ELA Course": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-ela-sat-9-12/dp/81b322ee-93b3-4389-88af-bf11f7d0240f",
+        "description": "Two week intensive course focused on SAT Reading and Writing",
+        "duration": "2 weeks", 
+        "best_for": "Extended reading and writing preparation",
+        "recommended_timeline": "good"
+    },
     "Ultimate SAT Review Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-ultimate-sat-review-session/dp/2a08c912-0a50-4639-b097-dfcaa2f591de",
         "description": "Comprehensive review of key SAT concepts and strategies",
@@ -130,10 +144,17 @@ COURSE_CATALOG = {
     },
     "Proctored Practice SAT": {
         "url": "https://www.varsitytutors.com/courses/vtp-proctored-practiced-sat-9-12/dp/2298ff50-8011-48e7-acc0-c81cb25eeae1",
-        "description": "Practice SAT tests under real testing conditions",
-        "duration": "Ongoing",
-        "best_for": "Test practice and timing",
+        "description": "Practice SAT tests under real testing conditions - 3 hour sessions",
+        "duration": "3 hours per session",
+        "best_for": "Test practice and timing under real conditions",
         "recommended_timeline": "all"
+    },
+    "PSAT Prep Course": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-psat-prep-course/dp/50f02afb-2b2b-4f69-8057-dc5b9c53c629",
+        "description": "Comprehensive PSAT preparation course for underclassmen",
+        "duration": "Multiple weeks",
+        "best_for": "PSAT preparation and SAT foundation building",
+        "recommended_timeline": "excellent"
     }
 }
 
@@ -193,15 +214,17 @@ elif st.session_state.step == 2:
         timeline_status = "good" 
         st.warning("⚡ Good timeline - Focus on intensive options")
         recommended_classes = [
-            "SAT 4-Week Prep Course", "SAT 2-Week Bootcamp", "SAT Math Cram Session", 
-            "SAT Reading/Writing Cram Session", "Ultimate SAT Review Session", "Proctored Practice SAT"
+            "SAT 4-Week Prep Course", "SAT 2-Week Bootcamp", "2-Week SAT Math Course", 
+            "2-Week SAT ELA Course", "SAT Math Cram Session", "SAT Reading/Writing Cram Session",
+            "Ultimate SAT Review Session", "Proctored Practice SAT"
         ]
     else:
         timeline_status = "urgent"
         st.error("🚨 Urgent timeline - Focus on bootcamps and cram sessions")
         recommended_classes = [
             "SAT 2-Week Bootcamp", "1-Week SAT Math Bootcamp", "1-Week SAT ELA Bootcamp",
-            "SAT Math Cram Session", "SAT Reading/Writing Cram Session", "Ultimate SAT Review Session"
+            "SAT Math Cram Session", "SAT Reading/Writing Cram Session", "Ultimate SAT Review Session",
+            "Proctored Practice SAT"
         ]
     
     st.markdown("## Recommended Classes for Your Timeline")
