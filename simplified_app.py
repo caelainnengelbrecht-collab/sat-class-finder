@@ -9,9 +9,14 @@ from datetime import date, datetime, timedelta
 
 st.set_page_config(page_title="SAT Class Finder", page_icon="📚", layout="wide")
 
-# Simple styling
+# Enhanced styling with background
 st.markdown("""
 <style>
+/* Main app background */
+.stApp {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
 .main-header {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     padding: 30px 20px;
@@ -204,10 +209,60 @@ st.progress(progress, text=f"Step {st.session_state.step} of {len(progress_label
 
 # Step 1: Test Date Selection
 if st.session_state.step == 1:
-    st.markdown('<div class="main-header"><h1>📚 SAT Class Finder</h1><p>Find the perfect SAT prep classes for your test date</p></div>', unsafe_allow_html=True)
+    # Hero section with background
+    st.markdown('''
+    <div style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 60px 30px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden;
+    ">
+        <div style="
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            opacity: 0.5;
+        "></div>
+        <div style="
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            opacity: 0.3;
+        "></div>
+        <div style="position: relative; z-index: 2;">
+            <h1 style="color: white; font-size: 3em; margin: 0; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                📚 SAT Success Journey
+            </h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1.3em; margin: 20px 0 0 0; font-weight: 300;">
+                Choose your test date and unlock your college dreams
+            </p>
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
     
-    st.markdown("## Select Your SAT Test Date")
-    st.markdown("Choose from upcoming SAT test dates below:")
+    # Instruction section with icons
+    st.markdown('''
+    <div style="text-align: center; margin: 40px 0;">
+        <h2 style="color: #1f2937; font-weight: 700; margin-bottom: 20px;">
+            🎯 Select Your SAT Test Date
+        </h2>
+        <p style="color: #6b7280; font-size: 1.1em; max-width: 600px; margin: 0 auto;">
+            Pick the date that works best for your schedule. We'll recommend the perfect prep timeline based on your choice.
+        </p>
+    </div>
+    ''', unsafe_allow_html=True)
     
     # Filter out past dates
     available_dates = {date_str: date_obj for date_str, date_obj in SAT_DATES.items() 
@@ -216,73 +271,115 @@ if st.session_state.step == 1:
     if not available_dates:
         st.error("⚠️ No upcoming SAT dates available. Please check back later.")
     else:
-        # Create columns for available test dates
-        cols = st.columns(2)
-        col_index = 0
+        # Create single column layout for stacked buttons
+        st.markdown('<div style="max-width: 700px; margin: 0 auto;">', unsafe_allow_html=True)
         
         for i, (date_str, date_obj) in enumerate(available_dates.items()):
-            col = cols[col_index % 2]
             days_until = (date_obj - date.today()).days
             
             # Determine status and styling
             if days_until > 56:
                 status = "excellent"
-                status_text = "✅ Plenty of time for comprehensive prep"
+                status_text = "🌟 Perfect Timeline"
+                status_desc = "Plenty of time for comprehensive prep"
                 status_class = "excellent"
+                icon = "🚀"
+                gradient = "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                border_color = '#10b981'
             elif days_until > 28:
                 status = "good"
-                status_text = "⚡ Intensive prep recommended"
-                status_class = "good"
+                status_text = "⚡ Intensive Prep"
+                status_desc = "Good timeline for focused preparation"
+                status_class = "good" 
+                icon = "💪"
+                gradient = "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+                border_color = '#f59e0b'
             else:
                 status = "urgent"
-                status_text = "🚨 Urgent prep needed"
+                status_text = "🎯 Rush Mode"
+                status_desc = "Focused crash course needed"
                 status_class = "urgent"
+                icon = "⚡"
+                gradient = "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
+                border_color = '#ef4444'
             
-            with col:
-                # Add custom CSS for this specific button
-                border_color = '#22c55e' if status_class == 'excellent' else '#f59e0b' if status_class == 'good' else '#ef4444'
-                status_bg = 'rgba(34, 197, 94, 0.1)' if status_class == 'excellent' else 'rgba(245, 158, 11, 0.1)' if status_class == 'good' else 'rgba(239, 68, 68, 0.1)'
-                status_color = '#16a34a' if status_class == 'excellent' else '#d97706' if status_class == 'good' else '#dc2626'
+            # Custom CSS for this specific card button
+            st.markdown(f'''
+            <style>
+                .date-button-{i} button {{
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+                    border: 2px solid rgba(226, 232, 240, 0.8) !important;
+                    border-left: 8px solid {border_color} !important;
+                    border-radius: 20px !important;
+                    padding: 30px 25px !important;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+                    overflow: hidden !important;
+                    position: relative !important;
+                    width: 100% !important;
+                    height: auto !important;
+                    min-height: 140px !important;
+                    color: #1f2937 !important;
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
+                    white-space: pre-line !important;
+                    text-align: left !important;
+                    line-height: 1.6 !important;
+                }}
                 
-                st.markdown(f"""
-                <style>
-                    div[data-testid="column"]:nth-child({(col_index % 2) + 1}) .stButton:last-child button {{
-                        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-                        border: 2px solid rgba(226, 232, 240, 0.8) !important;
-                        border-left: 6px solid {border_color} !important;
-                        border-radius: 16px !important;
-                        padding: 24px 20px !important;
-                        height: auto !important;
-                        min-height: 120px !important;
-                        color: #0f172a !important;
-                        font-size: 14px !important;
-                        white-space: pre-line !important;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-                        transition: all 0.3s ease !important;
-                    }}
-                    div[data-testid="column"]:nth-child({(col_index % 2) + 1}) .stButton:last-child button:hover {{
-                        transform: translateY(-4px) !important;
-                        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
-                        border-color: #3b82f6 !important;
-                        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-                    }}
-                </style>
-                """, unsafe_allow_html=True)
+                .date-button-{i} button:hover {{
+                    transform: translateY(-8px) scale(1.02) !important;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+                    border-color: #3b82f6 !important;
+                }}
                 
-                # Button with date information formatted nicely
-                button_text = f"{date_str}\n{days_until} days from now\n{status_text}"
-                
-                if st.button(button_text, 
-                           key=f"date_{i}", 
-                           use_container_width=True,
-                           help=f"Click to select {date_str} as your SAT test date"):
+                .date-button-{i} button::before {{
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 120px;
+                    height: 120px;
+                    background: {gradient};
+                    opacity: 0.1;
+                    border-radius: 50%;
+                    transform: translate(30%, -30%);
+                }}
+            </style>
+            ''', unsafe_allow_html=True)
+            
+            # Create simple button text
+            button_text = f"{icon} {date_str}\n📅 {days_until} days from today\n{status_text} • {status_desc}"
+            
+            # Styled container for button
+            with st.container():
+                st.markdown(f'<div class="date-button-{i}" style="margin: 20px 0;">', unsafe_allow_html=True)
+                if st.button(button_text, key=f"date_{i}", use_container_width=True, help=f"Select {date_str} as your SAT test date"):
                     st.session_state.test_date = date_str
                     st.session_state.step = 2
                     st.rerun()
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-            
-            col_index += 1
+                st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Add motivational footer section
+        st.markdown('''
+        <div style="
+            margin: 60px 0 20px 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        ">
+            <h3 style="color: #1e40af; margin: 0 0 15px 0; font-weight: 700;">
+                🎯 Ready to Achieve Your Best SAT Score?
+            </h3>
+            <p style="color: #475569; font-size: 1.1em; margin: 0; max-width: 500px; margin: 0 auto;">
+                Choose your test date above and let's create your personalized prep plan with expert-led classes from Varsity Tutors.
+            </p>
+        </div>
+        ''', unsafe_allow_html=True)
 
 # Step 2: Class Selection
 elif st.session_state.step == 2:
