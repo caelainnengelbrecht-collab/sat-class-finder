@@ -642,6 +642,7 @@ elif st.session_state.step == 2:
                         {COURSE_CATALOG.get(item['course'], {}).get('description', 'Complete your SAT preparation with this essential course.')}
                     </p>
                 </div>
+            </div>
         ''', unsafe_allow_html=True)
         
         # Add enrollment button directly - no dropdown, immediate action
@@ -679,8 +680,6 @@ elif st.session_state.step == 2:
                 </p>
             </div>
             ''', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
     
     # Close timeline container and add motivational closing
     st.markdown(f'''
