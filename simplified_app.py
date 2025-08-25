@@ -199,6 +199,41 @@ COURSE_CATALOG = {
         "duration": "Multiple weeks",
         "best_for": "PSAT preparation and SAT foundation building",
         "recommended_timeline": "excellent"
+    },
+    "SAT Math 1-Week Bootcamp": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-math-9-12/dp/255ad018-d421-46fb-9e54-210e4045a491",
+        "description": "Intensive 1-week SAT Math bootcamp with daily sessions",
+        "duration": "1 week, 4 sessions",
+        "best_for": "Intensive Math preparation with limited time",
+        "recommended_timeline": "urgent"
+    },
+    "SAT Reading & Writing 1-Week Bootcamp": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-ela-9-12/dp/a4621f0a-e935-46ad-beda-de37624b05ba",
+        "description": "Intensive 1-week SAT Reading & Writing bootcamp with daily sessions",
+        "duration": "1 week, 4 sessions",
+        "best_for": "Intensive ELA preparation with limited time", 
+        "recommended_timeline": "urgent"
+    },
+    "SAT 8-Week Prep Class": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-sat-prep-course/dp/c85c2298-bd6a-4cd4-be0d-8f4f35d3f7eb",
+        "description": "Comprehensive 8-week SAT preparation with weekly sessions",
+        "duration": "8 weeks, weekly sessions",
+        "best_for": "Thorough preparation with extended timeline",
+        "recommended_timeline": "excellent"
+    },
+    "SAT 2-Week Math Review Prep Class": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-math-sat-9-12/dp/2f67b5be-e283-406f-b4d2-fe3fc17e52aa",
+        "description": "Focused 2-week Math review and preparation",
+        "duration": "2 weeks, weekly sessions",
+        "best_for": "Math-focused review preparation",
+        "recommended_timeline": "good"
+    },
+    "SAT 2-Week Reading & Writing Review Prep Class": {
+        "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-ela-sat-9-12/dp/81b322ee-93b3-4389-88af-bf11f7d0240f",
+        "description": "Focused 2-week Reading & Writing review and preparation",
+        "duration": "2 weeks, weekly sessions",
+        "best_for": "ELA-focused review preparation",
+        "recommended_timeline": "good"
     }
 }
 
@@ -555,37 +590,37 @@ elif st.session_state.step == 2:
         today = date.today()
         
         if item['course'] == "Proctored Practice SAT":
-            # Real SAT Proctored Practice Test dates from Varsity Tutors
+            # Real SAT Proctored Practice Test dates from Varsity Tutors (converted to ET)
             proctored_dates = [
-                "August 30 at 11:00 AM ET",
-                "September 6 at 10:00 AM ET", 
-                "September 13 at 11:00 AM ET",
-                "September 20 at 11:00 AM ET",
-                "September 27 at 10:00 AM ET",
-                "September 27 at 12:00 PM ET",
-                "October 4 at 11:00 AM ET",
-                "October 11 at 10:00 AM ET",
-                "October 18 at 11:00 AM ET",
-                "October 25 at 12:00 PM ET",
-                "November 1 at 11:00 AM ET",
-                "November 8 at 10:00 AM ET",
-                "November 15 at 11:00 AM ET",
-                "November 22 at 12:00 PM ET",
-                "November 29 at 10:00 AM ET",
-                "December 13 at 11:00 AM ET",
-                "December 20 at 12:00 PM ET",
-                "December 27 at 11:00 AM ET"
+                "August 30 at 12:00 PM ET",
+                "September 6 at 11:00 AM ET", 
+                "September 13 at 12:00 PM ET",
+                "September 20 at 12:00 PM ET",
+                "September 27 at 11:00 AM ET",
+                "September 27 at 1:00 PM ET",
+                "October 4 at 12:00 PM ET",
+                "October 11 at 11:00 AM ET",
+                "October 18 at 12:00 PM ET",
+                "October 25 at 1:00 PM ET",
+                "November 1 at 12:00 PM ET",
+                "November 8 at 11:00 AM ET",
+                "November 15 at 12:00 PM ET",
+                "November 22 at 1:00 PM ET",
+                "November 29 at 11:00 AM ET",
+                "December 13 at 12:00 PM ET",
+                "December 20 at 1:00 PM ET",
+                "December 27 at 12:00 PM ET"
             ]
             course_dates = proctored_dates
             
         elif item['course'] == "SAT 2-Week Bootcamp":
-            # Real SAT 2-Week Bootcamp dates from Varsity Tutors
+            # Real SAT 2-Week Bootcamp dates from Varsity Tutors (converted to ET)
             bootcamp_dates = [
-                "Aug 31 - Sep 10 | Sun, Mon, Tue, Wed @ 5:30 PM CT",
-                "Sep 21 - Oct 1 | Sun, Mon, Tue, Wed @ 6:00 PM CT", 
-                "Oct 27 - Nov 6 | Mon, Tue, Wed, Thu @ 6:00 PM CT",
-                "Mar 1 - Mar 11 | Sun, Mon, Tue, Wed @ 6:00 PM CT",
-                "Apr 19 - Apr 29 | Sun, Mon, Tue, Wed @ 6:00 PM CT"
+                "Aug 31 - Sep 10 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
+                "Sep 21 - Oct 1 | Sun, Mon, Tue, Wed @ 7:00 PM ET", 
+                "Oct 27 - Nov 6 | Mon, Tue, Wed, Thu @ 7:00 PM ET",
+                "Mar 1 - Mar 11 | Sun, Mon, Tue, Wed @ 7:00 PM ET",
+                "Apr 19 - Apr 29 | Sun, Mon, Tue, Wed @ 7:00 PM ET"
             ]
             course_dates = bootcamp_dates
             
@@ -606,40 +641,122 @@ elif st.session_state.step == 2:
             course_dates = review_dates
             
         elif item['course'] == "SAT Math Cram Session":
-            # Real SAT Math Cram Session dates from Varsity Tutors
+            # Real SAT Math Cram Session dates from Varsity Tutors (converted to ET)
             math_cram_dates = [
-                "Sep 7 @ 5:30 PM CT | 1hr 30min session",
-                "Sep 10 @ 8:00 PM CT | 1hr 30min session", 
-                "Sep 28 @ 5:00 PM CT | 1hr 30min session",
-                "Oct 1 @ 8:00 PM CT | 1hr 30min session",
-                "Nov 2 @ 5:30 PM CT | 1hr 30min session",
-                "Nov 5 @ 8:00 PM CT | 1hr 30min session",
-                "Nov 30 @ 5:30 PM CT | 1hr 30min session",
-                "Mar 8 @ 5:30 PM CT | 1hr 30min session",
-                "Apr 26 @ 5:30 PM CT | 1hr session"
+                "Sep 7 @ 6:30 PM ET | 1hr 30min session",
+                "Sep 10 @ 9:00 PM ET | 1hr 30min session", 
+                "Sep 28 @ 6:00 PM ET | 1hr 30min session",
+                "Oct 1 @ 9:00 PM ET | 1hr 30min session",
+                "Nov 2 @ 6:30 PM ET | 1hr 30min session",
+                "Nov 5 @ 9:00 PM ET | 1hr 30min session",
+                "Nov 30 @ 6:30 PM ET | 1hr 30min session",
+                "Mar 8 @ 6:30 PM ET | 1hr 30min session",
+                "Apr 26 @ 6:30 PM ET | 1hr session"
             ]
             course_dates = math_cram_dates
             
         elif item['course'] == "SAT 4-Week Prep Course":
-            # Real SAT 4-Week Prep Course dates from Varsity Tutors
+            # Real SAT 4-Week Prep Course dates from Varsity Tutors (converted to ET)
             prep_course_dates = [
-                "Sep 4-25 | Thu @ 8:00 PM CT | 6hr total",
-                "Sep 6-27 | Sat @ 10:30 AM CT | 6hr total",
-                "Sep 9-30 | Tue @ 5:00 PM CT | 6hr total",
-                "Oct 9-30 | Thu @ 7:30 PM CT | 6hr total",
-                "Oct 12 - Nov 2 | Sun @ 4:00 PM CT | 6hr total",
-                "Oct 15 - Nov 5 | Wed @ 5:00 PM CT | 6hr total",
-                "Nov 3-24 | Mon @ 8:00 PM CT | 6hr total",
-                "Nov 9-30 | Sun @ 3:30 PM CT | 6hr total",
-                "Nov 11 - Dec 2 | Tue @ 6:00 PM CT | 6hr total",
-                "Feb 15 - Mar 8 | Sun @ 4:00 PM CT | 6hr total",
-                "Feb 18 - Mar 11 | Wed @ 8:00 PM CT | 6hr total",
-                "Apr 4-25 | Sat @ 3:00 PM CT | 6hr total",
-                "Apr 8-29 | Wed @ 4:30 PM CT | 6hr total",
-                "Aug 17 - Sep 7 | Sun @ 4:00 PM CT | 6hr total",
-                "Aug 20 - Sep 10 | Wed @ 6:00 PM CT | 6hr total"
+                "Sep 4-25 | Thu @ 9:00 PM ET | 6hr total",
+                "Sep 6-27 | Sat @ 11:30 AM ET | 6hr total",
+                "Sep 9-30 | Tue @ 6:00 PM ET | 6hr total",
+                "Oct 9-30 | Thu @ 8:30 PM ET | 6hr total",
+                "Oct 12 - Nov 2 | Sun @ 5:00 PM ET | 6hr total",
+                "Oct 15 - Nov 5 | Wed @ 6:00 PM ET | 6hr total",
+                "Nov 3-24 | Mon @ 9:00 PM ET | 6hr total",
+                "Nov 9-30 | Sun @ 4:30 PM ET | 6hr total",
+                "Nov 11 - Dec 2 | Tue @ 7:00 PM ET | 6hr total",
+                "Feb 15 - Mar 8 | Sun @ 5:00 PM ET | 6hr total",
+                "Feb 18 - Mar 11 | Wed @ 9:00 PM ET | 6hr total",
+                "Apr 4-25 | Sat @ 4:00 PM ET | 6hr total",
+                "Apr 8-29 | Wed @ 5:30 PM ET | 6hr total",
+                "Aug 17 - Sep 7 | Sun @ 5:00 PM ET | 6hr total",
+                "Aug 20 - Sep 10 | Wed @ 7:00 PM ET | 6hr total"
             ]
             course_dates = prep_course_dates
+            
+        elif item['course'] == "SAT Reading/Writing Cram Session":
+            # Real SAT Reading & Writing Cram Session dates from Varsity Tutors (converted to ET)
+            reading_cram_dates = [
+                "Sep 7 @ 4:30 PM ET | 1hr 30min session",
+                "Sep 8 @ 7:00 PM ET | 1hr 30min session",
+                "Sep 28 @ 6:00 PM ET | 1hr 30min session", 
+                "Sep 29 @ 7:00 PM ET | 1hr 30min session",
+                "Nov 2 @ 4:30 PM ET | 1hr 30min session",
+                "Nov 3 @ 7:30 PM ET | 1hr 30min session",
+                "Nov 30 @ 5:30 PM ET | 1hr 30min session",
+                "Dec 1 @ 7:30 PM ET | 1hr 30min session",
+                "Mar 9 @ 7:30 PM ET | 1hr 30min session",
+                "Apr 27 @ 7:00 PM ET | 1hr 30min session"
+            ]
+            course_dates = reading_cram_dates
+            
+        elif item['course'] == "SAT Math 1-Week Bootcamp":
+            # Real SAT Math 1-Week Bootcamp dates from Varsity Tutors (converted to ET)
+            math_bootcamp_dates = [
+                "Sep 7-10 | Sun, Mon, Tue, Wed @ 8:00 PM ET",
+                "Sep 28 - Oct 1 | Sun, Mon, Tue, Wed @ 8:00 PM ET",
+                "Nov 2-5 | Sun, Mon, Tue, Wed @ 8:30 PM ET",
+                "Nov 30 - Dec 3 | Sun, Mon, Tue, Wed @ 8:30 PM ET",
+                "Dec 27-30 | Sat, Sun, Mon, Tue @ 2:00 PM ET",
+                "Mar 8-11 | Sun, Mon, Tue, Wed @ 8:30 PM ET",
+                "Apr 27-30 | Mon, Tue, Wed, Thu @ 8:30 PM ET"
+            ]
+            course_dates = math_bootcamp_dates
+            
+        elif item['course'] == "SAT Reading & Writing 1-Week Bootcamp":
+            # Real SAT Reading & Writing 1-Week Bootcamp dates from Varsity Tutors (converted to ET)
+            reading_bootcamp_dates = [
+                "Sep 7-10 | Sun, Mon, Tue, Wed @ 6:00 PM ET",
+                "Sep 28 - Oct 1 | Sun, Mon, Tue, Wed @ 6:00 PM ET", 
+                "Nov 2-5 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
+                "Nov 30 - Dec 3 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
+                "Dec 27-30 | Sat, Sun, Mon, Tue @ 12:00 PM ET",
+                "Mar 8-11 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
+                "Apr 27-30 | Mon, Tue, Wed, Thu @ 6:30 PM ET"
+            ]
+            course_dates = reading_bootcamp_dates
+            
+        elif item['course'] == "SAT 8-Week Prep Class":
+            # Real SAT 8-Week Prep Class dates from Varsity Tutors (converted to ET)
+            eight_week_dates = [
+                "Sep 11 - Oct 30 | Thu @ 5:30 PM ET | 8 weeks",
+                "Sep 13 - Nov 1 | Sat @ 12:00 PM ET | 8 weeks",
+                "Sep 16 - Nov 4 | Tue @ 8:00 PM ET | 8 weeks",
+                "Oct 7 - Nov 25 | Tue @ 5:30 PM ET | 8 weeks",
+                "Oct 11 - Nov 29 | Sat @ 10:00 AM ET | 8 weeks",
+                "Oct 13 - Dec 1 | Mon @ 8:00 PM ET | 8 weeks",
+                "Jan 17 - Mar 7 | Sat @ 11:00 AM ET | 8 weeks",
+                "Jan 20 - Mar 10 | Tue @ 7:00 PM ET | 8 weeks",
+                "Mar 7 - Apr 25 | Sat @ 10:00 AM ET | 8 weeks",
+                "Mar 10 - Apr 28 | Tue @ 8:00 PM ET | 8 weeks",
+                "Jul 19 - Sep 6 | Sat @ 11:00 AM ET | 8 weeks",
+                "Jul 22 - Sep 9 | Tue @ 8:00 PM ET | 8 weeks",
+                "Aug 9 - Sep 27 | Sat @ 10:00 AM ET | 8 weeks",
+                "Aug 11 - Sep 29 | Mon @ 8:00 PM ET | 8 weeks"
+            ]
+            course_dates = eight_week_dates
+            
+        elif item['course'] == "SAT 2-Week Math Review Prep Class":
+            # Real SAT 2-Week Math Review Prep Class dates from Varsity Tutors (converted to ET)
+            math_review_dates = [
+                "Sep 4-11 | Thu @ 8:00 PM ET | 2 weeks",
+                "Sep 20-27 | Sat @ 3:30 PM ET | 2 weeks", 
+                "Oct 26 - Nov 2 | Sun @ 1:00 PM ET | 2 weeks",
+                "Nov 23-30 | Sun @ 2:00 PM ET | 2 weeks"
+            ]
+            course_dates = math_review_dates
+            
+        elif item['course'] == "SAT 2-Week Reading & Writing Review Prep Class":
+            # Real SAT 2-Week Reading & Writing Review Prep Class dates from Varsity Tutors (converted to ET)
+            reading_review_dates = [
+                "Sep 4-11 | Thu @ 6:00 PM ET | 2 weeks",
+                "Sep 21-28 | Sun @ 4:00 PM ET | 2 weeks",
+                "Oct 25 - Nov 1 | Sat @ 3:30 PM ET | 2 weeks",
+                "Nov 23-30 | Sun @ 4:00 PM ET | 2 weeks"
+            ]
+            course_dates = reading_review_dates
             
         elif "1-Week" in item['course'] or "Cram Session" in item['course']:
             # Short intensive courses - multiple weekly start dates
@@ -828,6 +945,116 @@ elif st.session_state.step == 2:
                         </a>
                         <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
                             Intensive SAT Reading and Writing strategies
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT Math 1-Week Bootcamp":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           ⚡ Join Math Bootcamp: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Intensive 1-week Math bootcamp • 4 daily sessions
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT Reading & Writing 1-Week Bootcamp":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           📖 Join ELA Bootcamp: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Intensive 1-week ELA bootcamp • 4 daily sessions
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT 8-Week Prep Class":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           📚 Enroll 8-Week Course: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Comprehensive 8-week preparation • Weekly sessions
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT 2-Week Math Review Prep Class":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           🔢 Enroll Math Review: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Focused 2-week Math review • Weekly sessions
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT 2-Week Reading & Writing Review Prep Class":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           📖 Enroll ELA Review: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Focused 2-week ELA review • Weekly sessions
                         </p>
                     </div>
                     ''', unsafe_allow_html=True)
