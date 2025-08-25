@@ -48,6 +48,72 @@ st.markdown("""
     font-weight: 600;
 }
 
+/* Date selection box styling */
+.date-box {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    margin: 12px 0;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.date-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.date-box.excellent {
+    border-left: 6px solid #22c55e;
+}
+
+.date-box.good {
+    border-left: 6px solid #f59e0b;
+}
+
+.date-box.urgent {
+    border-left: 6px solid #ef4444;
+}
+
+.date-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.date-days {
+    font-size: 1em;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.date-status {
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.date-status.excellent {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.date-status.good {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.date-status.urgent {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
 /* Enrollment link styling */
 .enrollment-card a {
     background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
@@ -185,32 +251,58 @@ if st.session_state.step == 1:
     st.markdown('<div class="main-header"><h1>📚 SAT Class Finder</h1><p>Find the perfect SAT prep classes for your test date</p></div>', unsafe_allow_html=True)
     
     st.markdown("## Select Your SAT Test Date")
+    st.markdown("Choose from upcoming SAT test dates below:")
     
-    # Create columns for test dates
-    cols = st.columns(2)
-    for i, (date_str, date_obj) in enumerate(SAT_DATES.items()):
-        col = cols[i % 2]
-        days_until = (date_obj - date.today()).days
+    # Filter out past dates
+    available_dates = {date_str: date_obj for date_str, date_obj in SAT_DATES.items() 
+                      if (date_obj - date.today()).days > 0}
+    
+    if not available_dates:
+        st.error("⚠️ No upcoming SAT dates available. Please check back later.")
+    else:
+        # Create columns for available test dates
+        cols = st.columns(2)
+        col_index = 0
         
-        with col:
-            if days_until > 0:
-                st.markdown(f"### {date_str}")
-                st.markdown(f"**{days_until} days from now**")
+        for i, (date_str, date_obj) in enumerate(available_dates.items()):
+            col = cols[col_index % 2]
+            days_until = (date_obj - date.today()).days
+            
+            # Determine status and styling
+            if days_until > 56:
+                status = "excellent"
+                status_text = "✅ Plenty of time for comprehensive prep"
+                status_class = "excellent"
+            elif days_until > 28:
+                status = "good"
+                status_text = "⚡ Intensive prep recommended"
+                status_class = "good"
+            else:
+                status = "urgent"
+                status_text = "🚨 Urgent prep needed"
+                status_class = "urgent"
+            
+            with col:
+                # Create clickable date box
+                date_box_html = f"""
+                <div class="date-box {status_class}">
+                    <div class="date-title">{date_str}</div>
+                    <div class="date-days">{days_until} days from now</div>
+                    <div class="date-status {status_class}">{status_text}</div>
+                </div>
+                """
+                st.markdown(date_box_html, unsafe_allow_html=True)
                 
-                if days_until > 56:
-                    st.success("✅ Plenty of time for comprehensive prep")
-                elif days_until > 28:
-                    st.warning("⚡ Intensive prep recommended")
-                else:
-                    st.error("🚨 Urgent prep needed")
-                
+                # Button for selection
                 if st.button(f"Choose {date_str}", key=f"date_{i}", use_container_width=True):
                     st.session_state.test_date = date_str
                     st.session_state.step = 2
                     st.rerun()
-            else:
-                st.markdown(f"### {date_str}")
-                st.markdown("**Past date**")
+                
+                # Add some spacing
+                st.markdown("<br>", unsafe_allow_html=True)
+            
+            col_index += 1
 
 # Step 2: Class Selection
 elif st.session_state.step == 2:
