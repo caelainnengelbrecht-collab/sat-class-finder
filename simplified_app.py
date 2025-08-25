@@ -533,201 +533,87 @@ elif st.session_state.step == 2:
             </span>
         </div>
         
-        <!-- Timeline Container -->
-        <div style="
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px 0;
-        ">
-            <!-- Timeline Line -->
-            <div style="
-                position: absolute;
-                left: 50px;
-                top: 0;
-                bottom: 0;
-                width: 4px;
-                background: linear-gradient(to bottom, {timeline_color}, rgba(156, 163, 175, 0.3));
-                border-radius: 2px;
-            "></div>
     ''', unsafe_allow_html=True)
     
-    # Create step-by-step timeline with sequential enrollment
+    # Create step-by-step timeline using Streamlit components
     for step_number, item in enumerate(schedule, 1):
-        # Create timeline item
-        st.markdown(f'''
-            <!-- Timeline Item {step_number} -->
-            <div style="
-                position: relative;
-                margin: 30px 0 30px 80px;
+        # Create container for each step
+        with st.container():
+            # Add some custom styling for the container
+            st.markdown(f"""
+            <style>
+            .step-container-{step_number} {{
+                background: white;
                 padding: 30px;
-                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-                border: 2px solid rgba(226, 232, 240, 0.8);
                 border-radius: 20px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s ease;
-            " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 16px 48px rgba(0, 0, 0, 0.15)'"
-               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 32px rgba(0, 0, 0, 0.1)'">
-                
-                <!-- Timeline Node -->
-                <div style="
-                    position: absolute;
-                    left: -59px;
-                    top: 25px;
-                    width: 70px;
-                    height: 70px;
-                    background: {timeline_color};
-                    border: 6px solid white;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.8em;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-                    z-index: 2;
-                ">
-                    {item['icon']}
-                </div>
-                
-                <!-- Step Number Badge -->
-                <div style="
-                    position: absolute;
-                    top: -10px;
-                    right: 20px;
-                    background: linear-gradient(135deg, {timeline_color}, rgba(75, 85, 99, 0.8));
-                    color: white;
-                    padding: 8px 16px;
-                    border-radius: 20px;
-                    font-weight: 700;
-                    font-size: 0.85em;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                ">
-                    STEP {step_number}
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3 style="
-                        color: #1f2937;
-                        font-size: 1.5em;
-                        font-weight: 800;
-                        margin: 0 0 10px 0;
-                        line-height: 1.2;
-                    ">
-                        {item['course']}
-                    </h3>
-                    <p style="
-                        color: #6b7280;
-                        font-size: 1.1em;
-                        margin: 0 0 15px 0;
-                        line-height: 1.5;
-                    ">
-                        {item['focus']} • {item['weeks']}
-                    </p>
-                </div>
-                
-                <!-- Course Description -->
-                <div style="
-                    background: rgba(59, 130, 246, 0.05);
-                    padding: 20px;
-                    border-radius: 12px;
-                    border-left: 4px solid {timeline_color};
-                    margin-bottom: 25px;
-                ">
-                    <p style="
-                        color: #374151;
-                        margin: 0;
-                        font-size: 1.05em;
-                        line-height: 1.6;
-                    ">
-                        {COURSE_CATALOG.get(item['course'], {}).get('description', 'Complete your SAT preparation with this essential course.')}
-                    </p>
-                </div>
-            </div>
-        ''', unsafe_allow_html=True)
-        
-        # Add enrollment button directly - no dropdown, immediate action
-        course_info = COURSE_CATALOG.get(item['course'], {})
-        if course_info and course_info.get('url'):
-            st.markdown(f'''
-            <div style="text-align: center; margin-top: 25px;">
-                <a href="{course_info['url']}" 
-                   target="_blank" 
-                   style="
-                       background: linear-gradient(135deg, {timeline_color}, rgba(75, 85, 99, 0.9));
-                       color: white;
-                       padding: 15px 30px;
-                       border-radius: 12px;
-                       text-decoration: none;
-                       font-weight: 700;
-                       font-size: 1.1em;
-                       display: inline-flex;
-                       align-items: center;
-                       gap: 10px;
-                       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-                       transition: all 0.3s ease;
-                   "
-                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.2)'"
-                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.15)'">
-                   🎯 Enroll in Step {step_number}: {item['course']}
-                </a>
-                <p style="
-                    color: #6b7280;
-                    font-size: 0.9em;
-                    margin: 12px 0 0 0;
-                    font-style: italic;
-                ">
-                    Click to view available class times and enroll at Varsity Tutors
-                </p>
-            </div>
-            ''', unsafe_allow_html=True)
+                border: 2px solid #e2e8f0;
+                margin: 20px 0;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                position: relative;
+            }}
+            .step-badge-{step_number} {{
+                background: {timeline_color};
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: 700;
+                font-size: 0.9em;
+                margin-bottom: 15px;
+                display: inline-block;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+            
+            #st.markdown(f'<div class="step-container-{step_number}">', unsafe_allow_html=True)
+            
+            # Step badge
+            st.markdown(f'<span class="step-badge-{step_number}">{item["icon"]} STEP {step_number}</span>', unsafe_allow_html=True)
+            
+            # Course title and details
+            st.markdown(f"### {item['course']}")
+            st.markdown(f"**{item['focus']}** • *{item['weeks']}*")
+            
+            # Course description  
+            course_desc = COURSE_CATALOG.get(item['course'], {}).get('description', 'Complete your SAT preparation with this essential course.')
+            st.info(f"📚 {course_desc}")
+            
+            # Enrollment button
+            course_info = COURSE_CATALOG.get(item['course'], {})
+            if course_info and course_info.get('url'):
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <a href="{course_info['url']}" target="_blank" 
+                           style="background: {timeline_color}; color: white; padding: 15px 30px; 
+                                  border-radius: 12px; text-decoration: none; font-weight: 700; 
+                                  font-size: 1.1em; display: inline-block;">
+                           🎯 Enroll in Step {step_number}
+                        </a>
+                        <p style="color: #6b7280; font-size: 0.9em; margin-top: 10px; font-style: italic;">
+                            Click to view available class times and enroll at Varsity Tutors
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            # Add some space between steps
+            st.markdown("<br>", unsafe_allow_html=True)
     
-    # Close timeline container and add motivational closing
-    st.markdown(f'''
-        </div>
-        
-        <!-- Success Path Message -->
-        <div style="
-            text-align: center;
-            padding: 40px;
-            background: linear-gradient(135deg, {timeline_color}20, {timeline_color}10);
-            border-radius: 20px;
-            margin: 40px auto;
-            max-width: 600px;
-        ">
-            <h3 style="color: #1f2937; margin-bottom: 15px;">
-                🎯 Your Path to SAT Success
-            </h3>
-            <p style="
-                color: #4b5563;
-                font-size: 1.1em;
-                line-height: 1.6;
-                margin: 0;
-            ">
-                Follow this personalized timeline step-by-step to maximize your score improvement. 
-                Each course builds upon the previous one, creating a comprehensive prep experience 
-                that keeps you engaged all the way to test day!
-            </p>
-            <div style="margin-top: 25px;">
-                <span style="
-                    background: {timeline_color};
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 25px;
-                    font-weight: 600;
-                    font-size: 1em;
-                ">
-                    📞 Questions? Call Varsity Tutors: (800) 803-4058
-                </span>
-            </div>
-        </div>
-    </div>
-    ''', unsafe_allow_html=True)
-    # Navigation back to step 1  
-    st.markdown('<div style="text-align: center; margin: 40px 0;">', unsafe_allow_html=True)
-    if st.button("← Back to Test Date Selection", key="back_to_step1", use_container_width=False):
-        st.session_state.step = 1
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Add motivational closing using native Streamlit components
+    st.markdown("---")
+    st.markdown("### 🎯 Your Path to SAT Success")
+    st.markdown("""
+    Follow this personalized timeline step-by-step to maximize your score improvement. 
+    Each course builds upon the previous one, creating a comprehensive prep experience 
+    that keeps you engaged all the way to test day!
+    """)
+    st.info("📞 **Questions? Call Varsity Tutors: (800) 803-4058**")
+    # Navigation back to step 1
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("← Back to Test Date Selection", key="back_to_step1", use_container_width=True):
+            st.session_state.step = 1
+            st.rerun()
 
 # Footer
 st.markdown("---")
