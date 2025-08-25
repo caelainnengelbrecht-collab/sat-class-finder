@@ -502,7 +502,7 @@ elif st.session_state.step == 2:
             </div>
     ''', unsafe_allow_html=True)
     
-    # Display schedule cards
+    # Display schedule cards with date selection dropdowns
     for i, item in enumerate(schedule):
         st.markdown(f'''
         <div style="
@@ -512,44 +512,158 @@ elif st.session_state.step == 2:
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             border: 1px solid rgba(226, 232, 240, 0.8);
-            display: flex;
-            align-items: center;
         ">
-            <div style="
-                background: {timeline_color};
-                color: white;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.5em;
-                margin-right: 20px;
-                flex-shrink: 0;
-            ">
-                {item['icon']}
-            </div>
-            <div style="flex: 1;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 style="margin: 0; color: #1f2937; font-weight: 700;">{item['course']}</h4>
-                        <p style="margin: 5px 0; color: #6b7280;">{item['focus']}</p>
-                    </div>
-                    <div style="
-                        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
-                        padding: 8px 15px;
-                        border-radius: 20px;
-                        font-weight: 600;
-                        font-size: 0.9em;
-                        color: #374151;
-                    ">
-                        {item['weeks']}
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <div style="
+                    background: {timeline_color};
+                    color: white;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.5em;
+                    margin-right: 20px;
+                    flex-shrink: 0;
+                ">
+                    {item['icon']}
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; font-weight: 700;">{item['course']}</h4>
+                            <p style="margin: 5px 0; color: #6b7280;">{item['focus']}</p>
+                        </div>
+                        <div style="
+                            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+                            padding: 8px 15px;
+                            border-radius: 20px;
+                            font-weight: 600;
+                            font-size: 0.9em;
+                            color: #374151;
+                        ">
+                            {item['weeks']}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         ''', unsafe_allow_html=True)
+        
+        # Generate available dates for each course type
+        course_dates = []
+        today = date.today()
+        
+        if item['course'] == "Proctored Practice SAT":
+            # Generate upcoming Saturday dates for Proctored Practice SAT
+            for week in range(0, 16):  # Next 4 months of Saturdays
+                days_until_saturday = (5 - today.weekday()) % 7
+                if days_until_saturday == 0 and week == 0:  # Today is Saturday, start with next week
+                    days_until_saturday = 7
+                saturday_date = today + timedelta(days=days_until_saturday + (week * 7))
+                if saturday_date > today:  # Only future dates
+                    course_dates.append(f"Saturday, {saturday_date.strftime('%B %d, %Y')}")
+            
+        elif "1-Week" in item['course'] or "Cram Session" in item['course']:
+            # Short intensive courses - multiple weekly start dates
+            for week in range(0, 12):  # Next 3 months
+                start_date = today + timedelta(weeks=week)
+                if start_date.weekday() == 0:  # Monday start
+                    course_dates.append(f"Week of {start_date.strftime('%B %d, %Y')}")
+                    
+        elif "2-Week" in item['course']:
+            # 2-week courses - bi-weekly start dates
+            for week in range(0, 16, 2):  # Every 2 weeks for 4 months
+                start_date = today + timedelta(weeks=week)
+                if start_date.weekday() == 0:  # Monday start
+                    end_date = start_date + timedelta(weeks=2)
+                    course_dates.append(f"{start_date.strftime('%B %d')} - {end_date.strftime('%B %d, %Y')}")
+                    
+        elif "4-Week" in item['course']:
+            # 4-week courses - monthly start dates
+            for month in range(0, 6):  # Next 6 months
+                start_date = today + timedelta(weeks=month*4)
+                if start_date.weekday() == 0:  # Monday start
+                    end_date = start_date + timedelta(weeks=4)
+                    course_dates.append(f"{start_date.strftime('%B %d')} - {end_date.strftime('%B %d, %Y')}")
+                    
+        elif "8+" in item['course'] or item['course'] == "SAT Prep Course":
+            # Long comprehensive courses - monthly start dates
+            for month in range(0, 4):  # Next 4 months
+                start_date = today + timedelta(weeks=month*4)
+                if start_date.weekday() == 0:  # Monday start
+                    course_dates.append(f"Starting {start_date.strftime('%B %d, %Y')} (8+ weeks)")
+                    
+        else:
+            # Default single session courses
+            for week in range(0, 8):  # Next 2 months
+                session_date = today + timedelta(weeks=week)
+                if session_date.weekday() == 5:  # Saturday sessions
+                    course_dates.append(f"Saturday, {session_date.strftime('%B %d, %Y')}")
+        
+        # Create dropdown for date selection
+        if course_dates:
+            st.markdown(f'''
+            <div style="
+                background: rgba(59, 130, 246, 0.05);
+                padding: 12px;
+                border-radius: 8px;
+                border-left: 4px solid {timeline_color};
+            ">
+                <strong style="color: #1e40af; font-size: 0.9em;">📅 Select Your Class Date:</strong>
+            </div>
+            ''', unsafe_allow_html=True)
+            
+            selected_date = st.selectbox(
+                f"Choose date for {item['course']}",
+                options=["Select a date..."] + course_dates[:8],  # Limit to 8 options
+                key=f"schedule_date_{i}",
+                label_visibility="collapsed"
+            )
+            
+            if selected_date != "Select a date...":
+                st.success(f"✅ Selected: {selected_date}")
+                if item['course'] == "Proctored Practice SAT":
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="https://www.varsitytutors.com/courses/vtp-proctored-practiced-sat-9-12/dp/2298ff50-8011-48e7-acc0-c81cb25eeae1" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           🎯 Enroll for {selected_date}
+                        </a>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                else:
+                    # Get the enrollment URL for this course
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    if enrollment_url != '#':
+                        st.markdown(f'''
+                        <div style="margin-top: 8px;">
+                            <a href="{enrollment_url}" 
+                               target="_blank" 
+                               style="
+                                   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                   color: white;
+                                   padding: 8px 16px;
+                                   border-radius: 6px;
+                                   text-decoration: none;
+                                   font-weight: 600;
+                                   font-size: 0.9em;
+                               ">
+                               🎯 Enroll for {selected_date}
+                            </a>
+                        </div>
+                        ''', unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown('</div></div>', unsafe_allow_html=True)
     
