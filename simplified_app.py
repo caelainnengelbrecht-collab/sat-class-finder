@@ -238,7 +238,7 @@ COURSE_CATALOG = {
 }
 
 # Progress indicator
-progress_labels = ["Choose Test Date", "Select Classes", "Get Enrollment Links"]
+progress_labels = ["Choose Test Date", "Your SAT Prep Journey"]
 progress = st.session_state.step / len(progress_labels)
 st.progress(progress, text=f"Step {st.session_state.step} of {len(progress_labels)}: {progress_labels[st.session_state.step-1]}")
 
@@ -510,832 +510,226 @@ elif st.session_state.step == 2:
             {"weeks": "Ongoing", "course": "Proctored Practice SAT", "focus": "Practice", "icon": "📝"}
         ]
     
-    # Display suggested schedule timeline
+    # Display SAT prep journey timeline
     st.markdown(f'''
-    <div style="margin: 30px 0;">
-        <h2 style="text-align: center; color: #1f2937; margin-bottom: 30px;">
-            📅 Your Recommended Study Schedule
-        </h2>
+    <div style="margin: 40px 0;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h2 style="color: #1f2937; margin-bottom: 15px; font-size: 2.2em;">
+                🚀 Your SAT Success Journey
+            </h2>
+            <p style="color: #6b7280; font-size: 1.2em; margin-bottom: 20px;">
+                Follow this personalized timeline to maximize your SAT score
+            </p>
+            <span style="
+                background: {timeline_color};
+                color: white;
+                padding: 12px 25px;
+                border-radius: 30px;
+                font-weight: 700;
+                font-size: 1.1em;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            ">
+                {timeline_text} • {weeks_available} weeks to prepare
+            </span>
+        </div>
+        
+        <!-- Timeline Container -->
         <div style="
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 30px;
-            border-radius: 20px;
-            border-left: 6px solid {timeline_color};
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
         ">
-            <div style="text-align: center; margin-bottom: 25px;">
-                <span style="
-                    background: {timeline_color};
-                    color: white;
-                    padding: 8px 20px;
-                    border-radius: 25px;
-                    font-weight: 600;
-                    font-size: 1.1em;
-                ">
-                    {timeline_text} • {weeks_available} weeks available
-                </span>
-            </div>
+            <!-- Timeline Line -->
+            <div style="
+                position: absolute;
+                left: 50px;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background: linear-gradient(to bottom, {timeline_color}, rgba(156, 163, 175, 0.3));
+                border-radius: 2px;
+            "></div>
     ''', unsafe_allow_html=True)
     
-    # Display schedule cards with date selection dropdowns
-    for i, item in enumerate(schedule):
+    # Create step-by-step timeline with sequential enrollment
+    for step_number, item in enumerate(schedule, 1):
+        # Create timeline item
         st.markdown(f'''
-        <div style="
-            background: white;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        ">
-            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <!-- Timeline Item {step_number} -->
+            <div style="
+                position: relative;
+                margin: 30px 0 30px 80px;
+                padding: 30px;
+                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                border: 2px solid rgba(226, 232, 240, 0.8);
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 16px 48px rgba(0, 0, 0, 0.15)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 32px rgba(0, 0, 0, 0.1)'">
+                
+                <!-- Timeline Node -->
                 <div style="
+                    position: absolute;
+                    left: -59px;
+                    top: 25px;
+                    width: 70px;
+                    height: 70px;
                     background: {timeline_color};
-                    color: white;
-                    width: 50px;
-                    height: 50px;
+                    border: 6px solid white;
                     border-radius: 50%;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 1.5em;
-                    margin-right: 20px;
-                    flex-shrink: 0;
+                    font-size: 1.8em;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    z-index: 2;
                 ">
                     {item['icon']}
                 </div>
-                <div style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="margin: 0; color: #1f2937; font-weight: 700;">{item['course']}</h4>
-                            <p style="margin: 5px 0; color: #6b7280;">{item['focus']}</p>
-                        </div>
-                        <div style="
-                            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
-                            padding: 8px 15px;
-                            border-radius: 20px;
-                            font-weight: 600;
-                            font-size: 0.9em;
-                            color: #374151;
-                        ">
-                            {item['weeks']}
-                        </div>
-                    </div>
+                
+                <!-- Step Number Badge -->
+                <div style="
+                    position: absolute;
+                    top: -10px;
+                    right: 20px;
+                    background: linear-gradient(135deg, {timeline_color}, rgba(75, 85, 99, 0.8));
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: 700;
+                    font-size: 0.85em;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                ">
+                    STEP {step_number}
                 </div>
-            </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="
+                        color: #1f2937;
+                        font-size: 1.5em;
+                        font-weight: 800;
+                        margin: 0 0 10px 0;
+                        line-height: 1.2;
+                    ">
+                        {item['course']}
+                    </h3>
+                    <p style="
+                        color: #6b7280;
+                        font-size: 1.1em;
+                        margin: 0 0 15px 0;
+                        line-height: 1.5;
+                    ">
+                        {item['focus']} • {item['weeks']}
+                    </p>
+                </div>
+                
+                <!-- Course Description -->
+                <div style="
+                    background: rgba(59, 130, 246, 0.05);
+                    padding: 20px;
+                    border-radius: 12px;
+                    border-left: 4px solid {timeline_color};
+                    margin-bottom: 25px;
+                ">
+                    <p style="
+                        color: #374151;
+                        margin: 0;
+                        font-size: 1.05em;
+                        line-height: 1.6;
+                    ">
+                        {COURSE_CATALOG.get(item['course'], {}).get('description', 'Complete your SAT preparation with this essential course.')}
+                    </p>
+                </div>
         ''', unsafe_allow_html=True)
         
-        # Generate available dates for each course type
-        course_dates = []
-        today = date.today()
-        
-        if item['course'] == "Proctored Practice SAT":
-            # Real SAT Proctored Practice Test dates from Varsity Tutors (converted to ET)
-            proctored_dates = [
-                "August 30 at 12:00 PM ET",
-                "September 6 at 11:00 AM ET", 
-                "September 13 at 12:00 PM ET",
-                "September 20 at 12:00 PM ET",
-                "September 27 at 11:00 AM ET",
-                "September 27 at 1:00 PM ET",
-                "October 4 at 12:00 PM ET",
-                "October 11 at 11:00 AM ET",
-                "October 18 at 12:00 PM ET",
-                "October 25 at 1:00 PM ET",
-                "November 1 at 12:00 PM ET",
-                "November 8 at 11:00 AM ET",
-                "November 15 at 12:00 PM ET",
-                "November 22 at 1:00 PM ET",
-                "November 29 at 11:00 AM ET",
-                "December 13 at 12:00 PM ET",
-                "December 20 at 1:00 PM ET",
-                "December 27 at 12:00 PM ET"
-            ]
-            course_dates = proctored_dates
-            
-        elif item['course'] == "SAT 2-Week Bootcamp":
-            # Real SAT 2-Week Bootcamp dates from Varsity Tutors (converted to ET)
-            bootcamp_dates = [
-                "Aug 31 - Sep 10 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
-                "Sep 21 - Oct 1 | Sun, Mon, Tue, Wed @ 7:00 PM ET", 
-                "Oct 27 - Nov 6 | Mon, Tue, Wed, Thu @ 7:00 PM ET",
-                "Mar 1 - Mar 11 | Sun, Mon, Tue, Wed @ 7:00 PM ET",
-                "Apr 19 - Apr 29 | Sun, Mon, Tue, Wed @ 7:00 PM ET"
-            ]
-            course_dates = bootcamp_dates
-            
-        elif item['course'] == "Ultimate SAT Review Session":
-            # Real Ultimate SAT Review Session dates from Varsity Tutors
-            review_dates = [
-                "September 6 at 12:00 PM ET",
-                "September 9 at 8:00 PM ET",
-                "September 27 at 10:00 AM ET",
-                "September 30 at 8:00 PM ET",
-                "November 1 at 2:00 PM ET",
-                "November 4 at 8:30 PM ET",
-                "November 29 at 1:00 PM ET",
-                "December 2 at 8:00 PM ET",
-                "March 7 at 1:00 PM ET",
-                "April 25 at 12:00 PM ET"
-            ]
-            course_dates = review_dates
-            
-        elif item['course'] == "SAT Math Cram Session":
-            # Real SAT Math Cram Session dates from Varsity Tutors (converted to ET)
-            math_cram_dates = [
-                "Sep 7 @ 6:30 PM ET | 1hr 30min session",
-                "Sep 10 @ 9:00 PM ET | 1hr 30min session", 
-                "Sep 28 @ 6:00 PM ET | 1hr 30min session",
-                "Oct 1 @ 9:00 PM ET | 1hr 30min session",
-                "Nov 2 @ 6:30 PM ET | 1hr 30min session",
-                "Nov 5 @ 9:00 PM ET | 1hr 30min session",
-                "Nov 30 @ 6:30 PM ET | 1hr 30min session",
-                "Mar 8 @ 6:30 PM ET | 1hr 30min session",
-                "Apr 26 @ 6:30 PM ET | 1hr session"
-            ]
-            course_dates = math_cram_dates
-            
-        elif item['course'] == "SAT 4-Week Prep Course":
-            # Real SAT 4-Week Prep Course dates from Varsity Tutors (converted to ET)
-            prep_course_dates = [
-                "Sep 4-25 | Thu @ 9:00 PM ET | 6hr total",
-                "Sep 6-27 | Sat @ 11:30 AM ET | 6hr total",
-                "Sep 9-30 | Tue @ 6:00 PM ET | 6hr total",
-                "Oct 9-30 | Thu @ 8:30 PM ET | 6hr total",
-                "Oct 12 - Nov 2 | Sun @ 5:00 PM ET | 6hr total",
-                "Oct 15 - Nov 5 | Wed @ 6:00 PM ET | 6hr total",
-                "Nov 3-24 | Mon @ 9:00 PM ET | 6hr total",
-                "Nov 9-30 | Sun @ 4:30 PM ET | 6hr total",
-                "Nov 11 - Dec 2 | Tue @ 7:00 PM ET | 6hr total",
-                "Feb 15 - Mar 8 | Sun @ 5:00 PM ET | 6hr total",
-                "Feb 18 - Mar 11 | Wed @ 9:00 PM ET | 6hr total",
-                "Apr 4-25 | Sat @ 4:00 PM ET | 6hr total",
-                "Apr 8-29 | Wed @ 5:30 PM ET | 6hr total",
-                "Aug 17 - Sep 7 | Sun @ 5:00 PM ET | 6hr total",
-                "Aug 20 - Sep 10 | Wed @ 7:00 PM ET | 6hr total"
-            ]
-            course_dates = prep_course_dates
-            
-        elif item['course'] == "SAT Reading/Writing Cram Session":
-            # Real SAT Reading & Writing Cram Session dates from Varsity Tutors (converted to ET)
-            reading_cram_dates = [
-                "Sep 7 @ 4:30 PM ET | 1hr 30min session",
-                "Sep 8 @ 7:00 PM ET | 1hr 30min session",
-                "Sep 28 @ 6:00 PM ET | 1hr 30min session", 
-                "Sep 29 @ 7:00 PM ET | 1hr 30min session",
-                "Nov 2 @ 4:30 PM ET | 1hr 30min session",
-                "Nov 3 @ 7:30 PM ET | 1hr 30min session",
-                "Nov 30 @ 5:30 PM ET | 1hr 30min session",
-                "Dec 1 @ 7:30 PM ET | 1hr 30min session",
-                "Mar 9 @ 7:30 PM ET | 1hr 30min session",
-                "Apr 27 @ 7:00 PM ET | 1hr 30min session"
-            ]
-            course_dates = reading_cram_dates
-            
-        elif item['course'] == "SAT Math 1-Week Bootcamp":
-            # Real SAT Math 1-Week Bootcamp dates from Varsity Tutors (converted to ET)
-            math_bootcamp_dates = [
-                "Sep 7-10 | Sun, Mon, Tue, Wed @ 8:00 PM ET",
-                "Sep 28 - Oct 1 | Sun, Mon, Tue, Wed @ 8:00 PM ET",
-                "Nov 2-5 | Sun, Mon, Tue, Wed @ 8:30 PM ET",
-                "Nov 30 - Dec 3 | Sun, Mon, Tue, Wed @ 8:30 PM ET",
-                "Dec 27-30 | Sat, Sun, Mon, Tue @ 2:00 PM ET",
-                "Mar 8-11 | Sun, Mon, Tue, Wed @ 8:30 PM ET",
-                "Apr 27-30 | Mon, Tue, Wed, Thu @ 8:30 PM ET"
-            ]
-            course_dates = math_bootcamp_dates
-            
-        elif item['course'] == "SAT Reading & Writing 1-Week Bootcamp":
-            # Real SAT Reading & Writing 1-Week Bootcamp dates from Varsity Tutors (converted to ET)
-            reading_bootcamp_dates = [
-                "Sep 7-10 | Sun, Mon, Tue, Wed @ 6:00 PM ET",
-                "Sep 28 - Oct 1 | Sun, Mon, Tue, Wed @ 6:00 PM ET", 
-                "Nov 2-5 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
-                "Nov 30 - Dec 3 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
-                "Dec 27-30 | Sat, Sun, Mon, Tue @ 12:00 PM ET",
-                "Mar 8-11 | Sun, Mon, Tue, Wed @ 6:30 PM ET",
-                "Apr 27-30 | Mon, Tue, Wed, Thu @ 6:30 PM ET"
-            ]
-            course_dates = reading_bootcamp_dates
-            
-        elif item['course'] == "SAT 8-Week Prep Class":
-            # Real SAT 8-Week Prep Class dates from Varsity Tutors (converted to ET)
-            eight_week_dates = [
-                "Sep 11 - Oct 30 | Thu @ 5:30 PM ET | 8 weeks",
-                "Sep 13 - Nov 1 | Sat @ 12:00 PM ET | 8 weeks",
-                "Sep 16 - Nov 4 | Tue @ 8:00 PM ET | 8 weeks",
-                "Oct 7 - Nov 25 | Tue @ 5:30 PM ET | 8 weeks",
-                "Oct 11 - Nov 29 | Sat @ 10:00 AM ET | 8 weeks",
-                "Oct 13 - Dec 1 | Mon @ 8:00 PM ET | 8 weeks",
-                "Jan 17 - Mar 7 | Sat @ 11:00 AM ET | 8 weeks",
-                "Jan 20 - Mar 10 | Tue @ 7:00 PM ET | 8 weeks",
-                "Mar 7 - Apr 25 | Sat @ 10:00 AM ET | 8 weeks",
-                "Mar 10 - Apr 28 | Tue @ 8:00 PM ET | 8 weeks",
-                "Jul 19 - Sep 6 | Sat @ 11:00 AM ET | 8 weeks",
-                "Jul 22 - Sep 9 | Tue @ 8:00 PM ET | 8 weeks",
-                "Aug 9 - Sep 27 | Sat @ 10:00 AM ET | 8 weeks",
-                "Aug 11 - Sep 29 | Mon @ 8:00 PM ET | 8 weeks"
-            ]
-            course_dates = eight_week_dates
-            
-        elif item['course'] == "SAT 2-Week Math Review Prep Class":
-            # Real SAT 2-Week Math Review Prep Class dates from Varsity Tutors (converted to ET)
-            math_review_dates = [
-                "Sep 4-11 | Thu @ 8:00 PM ET | 2 weeks",
-                "Sep 20-27 | Sat @ 3:30 PM ET | 2 weeks", 
-                "Oct 26 - Nov 2 | Sun @ 1:00 PM ET | 2 weeks",
-                "Nov 23-30 | Sun @ 2:00 PM ET | 2 weeks"
-            ]
-            course_dates = math_review_dates
-            
-        elif item['course'] == "SAT 2-Week Reading & Writing Review Prep Class":
-            # Real SAT 2-Week Reading & Writing Review Prep Class dates from Varsity Tutors (converted to ET)
-            reading_review_dates = [
-                "Sep 4-11 | Thu @ 6:00 PM ET | 2 weeks",
-                "Sep 21-28 | Sun @ 4:00 PM ET | 2 weeks",
-                "Oct 25 - Nov 1 | Sat @ 3:30 PM ET | 2 weeks",
-                "Nov 23-30 | Sun @ 4:00 PM ET | 2 weeks"
-            ]
-            course_dates = reading_review_dates
-            
-        elif "1-Week" in item['course'] or "Cram Session" in item['course']:
-            # Short intensive courses - multiple weekly start dates
-            for week in range(0, 12):  # Next 3 months
-                start_date = today + timedelta(weeks=week)
-                if start_date.weekday() == 0:  # Monday start
-                    course_dates.append(f"Week of {start_date.strftime('%B %d, %Y')}")
-                    
-        elif "2-Week" in item['course']:
-            # 2-week courses - bi-weekly start dates
-            for week in range(0, 16, 2):  # Every 2 weeks for 4 months
-                start_date = today + timedelta(weeks=week)
-                if start_date.weekday() == 0:  # Monday start
-                    end_date = start_date + timedelta(weeks=2)
-                    course_dates.append(f"{start_date.strftime('%B %d')} - {end_date.strftime('%B %d, %Y')}")
-                    
-        elif "4-Week" in item['course']:
-            # 4-week courses - bi-weekly start dates (fallback for other 4-week courses)
-            for month in range(0, 6):  # Next 6 months
-                start_date = today + timedelta(weeks=month*4)
-                if start_date.weekday() == 0:  # Monday start
-                    end_date = start_date + timedelta(weeks=4)
-                    course_dates.append(f"{start_date.strftime('%B %d')} - {end_date.strftime('%B %d, %Y')}")
-                    
-        elif "8+" in item['course'] or item['course'] == "SAT Prep Course":
-            # Long comprehensive courses - monthly start dates
-            for month in range(0, 4):  # Next 4 months
-                start_date = today + timedelta(weeks=month*4)
-                if start_date.weekday() == 0:  # Monday start
-                    course_dates.append(f"Starting {start_date.strftime('%B %d, %Y')} (8+ weeks)")
-                    
-        else:
-            # Default single session courses
-            for week in range(0, 8):  # Next 2 months
-                session_date = today + timedelta(weeks=week)
-                if session_date.weekday() == 5:  # Saturday sessions
-                    course_dates.append(f"Saturday, {session_date.strftime('%B %d, %Y')}")
-        
-        # Create dropdown for date selection
-        if course_dates:
+        # Add enrollment button directly - no dropdown, immediate action
+        course_info = COURSE_CATALOG.get(item['course'], {})
+        if course_info and course_info.get('url'):
             st.markdown(f'''
-            <div style="
-                background: rgba(59, 130, 246, 0.05);
-                padding: 12px;
-                border-radius: 8px;
-                border-left: 4px solid {timeline_color};
-            ">
-                <strong style="color: #1e40af; font-size: 0.9em;">📅 Select Your Class Date:</strong>
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="{course_info['url']}" 
+                   target="_blank" 
+                   style="
+                       background: linear-gradient(135deg, {timeline_color}, rgba(75, 85, 99, 0.9));
+                       color: white;
+                       padding: 15px 30px;
+                       border-radius: 12px;
+                       text-decoration: none;
+                       font-weight: 700;
+                       font-size: 1.1em;
+                       display: inline-flex;
+                       align-items: center;
+                       gap: 10px;
+                       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                       transition: all 0.3s ease;
+                   "
+                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.2)'"
+                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.15)'">
+                   🎯 Enroll in Step {step_number}: {item['course']}
+                </a>
+                <p style="
+                    color: #6b7280;
+                    font-size: 0.9em;
+                    margin: 12px 0 0 0;
+                    font-style: italic;
+                ">
+                    Click to view available class times and enroll at Varsity Tutors
+                </p>
             </div>
             ''', unsafe_allow_html=True)
-            
-            selected_date = st.selectbox(
-                f"Choose date for {item['course']}",
-                options=["Select a date..."] + course_dates,  # Show all available dates
-                key=f"schedule_date_{i}",
-                label_visibility="collapsed"
-            )
-            
-            if selected_date != "Select a date...":
-                st.success(f"✅ Selected: {selected_date}")
-                if item['course'] == "Proctored Practice SAT":
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="https://www.varsitytutors.com/courses/vtp-proctored-practiced-sat-9-12/dp/2298ff50-8011-48e7-acc0-c81cb25eeae1" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           📝 Join Practice Test: {selected_date}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            3-hour proctored SAT under real test conditions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT 2-Week Bootcamp":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           🚀 Enroll in Bootcamp: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Intensive 2-week SAT prep with 4 sessions per week
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "Ultimate SAT Review Session":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           🎯 Join Review Session: {selected_date}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Final review of key SAT concepts and strategies
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT Math Cram Session":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           🔢 Join Math Cram: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Intensive SAT Math strategies and problem-solving
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT 4-Week Prep Course":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           📚 Enroll 4-Week Course: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Comprehensive 4-week SAT preparation • Weekly 90min sessions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT Reading/Writing Cram Session":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           📖 Join Reading/Writing Cram: {selected_date}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Intensive SAT Reading and Writing strategies
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT Math 1-Week Bootcamp":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           ⚡ Join Math Bootcamp: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Intensive 1-week Math bootcamp • 4 daily sessions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT Reading & Writing 1-Week Bootcamp":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           📖 Join ELA Bootcamp: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Intensive 1-week ELA bootcamp • 4 daily sessions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT 8-Week Prep Class":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #059669 0%, #047857 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           📚 Enroll 8-Week Course: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Comprehensive 8-week preparation • Weekly sessions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT 2-Week Math Review Prep Class":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           🔢 Enroll Math Review: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Focused 2-week Math review • Weekly sessions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                elif item['course'] == "SAT 2-Week Reading & Writing Review Prep Class":
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    st.markdown(f'''
-                    <div style="margin-top: 8px;">
-                        <a href="{enrollment_url}" 
-                           target="_blank" 
-                           style="
-                               background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                               color: white;
-                               padding: 8px 16px;
-                               border-radius: 6px;
-                               text-decoration: none;
-                               font-weight: 600;
-                               font-size: 0.9em;
-                           ">
-                           📖 Enroll ELA Review: {selected_date.split(' |')[0]}
-                        </a>
-                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
-                            Focused 2-week ELA review • Weekly sessions
-                        </p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                else:
-                    # Get the enrollment URL for this course
-                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
-                    if enrollment_url != '#':
-                        st.markdown(f'''
-                        <div style="margin-top: 8px;">
-                            <a href="{enrollment_url}" 
-                               target="_blank" 
-                               style="
-                                   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                                   color: white;
-                                   padding: 8px 16px;
-                                   border-radius: 6px;
-                                   text-decoration: none;
-                                   font-weight: 600;
-                                   font-size: 0.9em;
-                               ">
-                               🎯 Enroll for {selected_date}
-                            </a>
-                        </div>
-                        ''', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown('</div></div>', unsafe_allow_html=True)
-    
-    # Course selection section
-    st.markdown('''
-    <div style="margin: 50px 0 30px 0;">
-        <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">
-            🎯 Select Your Classes
-        </h2>
-        <p style="text-align: center; color: #6b7280; font-size: 1.1em; margin-bottom: 30px;">
-            Choose the courses that match your schedule and learning goals
-        </p>
-    </div>
-    ''', unsafe_allow_html=True)
-    
-    selected_classes = []
-    
-    # Display recommended classes in beautiful boxes
-    st.markdown('<div style="max-width: 800px; margin: 0 auto;">', unsafe_allow_html=True)
-    
-    for i, course_name in enumerate(recommended_classes):
-        course_info = COURSE_CATALOG[course_name]
+    # Close timeline container and add motivational closing
+    st.markdown(f'''
+        </div>
         
-        # Determine course category for styling
-        if "Bootcamp" in course_name or "Cram" in course_name:
-            course_gradient = "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
-            course_icon = "⚡"
-            course_category = "Intensive"
-        elif "Math" in course_name:
-            course_gradient = "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
-            course_icon = "🔢"
-            course_category = "Math Focus"
-        elif "ELA" in course_name or "Reading" in course_name or "Writing" in course_name:
-            course_gradient = "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
-            course_icon = "📖"
-            course_category = "English Focus"
-        elif "Practice" in course_name:
-            course_gradient = "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-            course_icon = "📝"
-            course_category = "Practice"
-        else:
-            course_gradient = "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
-            course_icon = "📚"
-            course_category = "Comprehensive"
-        
-        # Create course card
-        st.markdown(f'''
-        <div style="margin: 20px 0;">
-            <style>
-                .course-card-{i} {{
-                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-                    border: 2px solid rgba(226, 232, 240, 0.8);
-                    border-radius: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                    transition: all 0.3s ease;
-                    overflow: hidden;
-                    position: relative;
-                }}
-                
-                .course-card-{i}:hover {{
-                    transform: translateY(-4px);
-                    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
-                    border-color: #3b82f6;
-                }}
-                
-                .course-card-{i}::before {{
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 100px;
-                    height: 100px;
-                    background: {course_gradient};
-                    opacity: 0.1;
-                    border-radius: 50%;
-                    transform: translate(30%, -30%);
-                }}
-            </style>
-            
-            <div class="course-card-{i}">
-                <div style="padding: 25px; position: relative; z-index: 1;">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center;">
-                            <div style="
-                                background: {course_gradient};
-                                color: white;
-                                width: 50px;
-                                height: 50px;
-                                border-radius: 12px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 1.5em;
-                                margin-right: 15px;
-                            ">
-                                {course_icon}
-                            </div>
-                            <div>
-                                <h3 style="margin: 0; color: #1f2937; font-size: 1.3em; font-weight: 700;">
-                                    {course_name}
-                                </h3>
-                                <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 0.9em; font-weight: 500;">
-                                    {course_category} • {course_info['duration']}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <p style="color: #4b5563; margin-bottom: 15px; line-height: 1.5;">
-                        {course_info['description']}
-                    </p>
-                    
-                    <div style="
-                        background: rgba(59, 130, 246, 0.1);
-                        padding: 12px 16px;
-                        border-radius: 10px;
-                        border-left: 4px solid #3b82f6;
-                        margin-bottom: 20px;
-                    ">
-                        <strong style="color: #1e40af;">Best for:</strong> 
-                        <span style="color: #374151;">{course_info['best_for']}</span>
-                    </div>
-                </div>
+        <!-- Success Path Message -->
+        <div style="
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, {timeline_color}20, {timeline_color}10);
+            border-radius: 20px;
+            margin: 40px auto;
+            max-width: 600px;
+        ">
+            <h3 style="color: #1f2937; margin-bottom: 15px;">
+                🎯 Your Path to SAT Success
+            </h3>
+            <p style="
+                color: #4b5563;
+                font-size: 1.1em;
+                line-height: 1.6;
+                margin: 0;
+            ">
+                Follow this personalized timeline step-by-step to maximize your score improvement. 
+                Each course builds upon the previous one, creating a comprehensive prep experience 
+                that keeps you engaged all the way to test day!
+            </p>
+            <div style="margin-top: 25px;">
+                <span style="
+                    background: {timeline_color};
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    font-size: 1em;
+                ">
+                    📞 Questions? Call Varsity Tutors: (800) 803-4058
+                </span>
             </div>
         </div>
-        ''', unsafe_allow_html=True)
-        
-        # Checkbox for selection
-        selected = st.checkbox(
-            f"✅ Select {course_name}",
-            key=f"course_{course_name}",
-            help=f"Add {course_name} to your study plan"
-        )
-        
-        if selected:
-            selected_classes.append(course_name)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-    
+    </div>
+    ''', unsafe_allow_html=True)
+    # Navigation back to step 1  
+    st.markdown('<div style="text-align: center; margin: 40px 0;">', unsafe_allow_html=True)
+    if st.button("← Back to Test Date Selection", key="back_to_step1", use_container_width=False):
+        st.session_state.step = 1
+        st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Update session state
-    st.session_state.selected_classes = selected_classes
-    
-    # Show selection summary
-    if selected_classes:
-        st.markdown(f'''
-        <div style="
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #a7f3d0;
-            margin: 30px 0;
-            text-align: center;
-        ">
-            <h3 style="color: #065f46; margin-bottom: 15px;">✅ Your Selected Classes ({len(selected_classes)})</h3>
-        ''', unsafe_allow_html=True)
-        
-        for class_name in selected_classes:
-            st.markdown(f'<p style="color: #047857; margin: 5px 0;">📚 {class_name}</p>', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Navigation buttons
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("← Back to Test Date", key="back_to_step1", use_container_width=True):
-            st.session_state.step = 1
-            st.rerun()
-    with col2:
-        if st.button("Get Enrollment Links →", key="continue_to_step3", disabled=(len(selected_classes) == 0), use_container_width=True):
-            st.session_state.step = 3
-            st.rerun()
-    
-    if len(selected_classes) == 0:
-        st.info("💡 Please select at least one class to continue to enrollment links")
-
-# Step 3: Enrollment Links
-elif st.session_state.step == 3:
-    st.markdown('<div class="main-header"><h1>🎯 Your SAT Class Enrollment</h1><p>Click the links below to enroll in your selected classes</p></div>', unsafe_allow_html=True)
-    
-    st.markdown(f"## Test Date: {st.session_state.test_date}")
-    target_date_obj = SAT_DATES[st.session_state.test_date]
-    days_until = (target_date_obj - date.today()).days
-    st.markdown(f"**{days_until} days to prepare**")
-    
-    if st.session_state.selected_classes:
-        st.markdown("## 🎓 Your Selected Classes")
-        st.info("📌 **How to Enroll:** Click the 'Enroll Now' buttons below. Each link will open the official Varsity Tutors course page in a new tab where you can view available class times and complete your enrollment.")
-        st.markdown("**Click the 'Enroll Now' buttons to register for your classes:**")
-        
-        # Create enrollment cards for each selected class
-        for course_name in st.session_state.selected_classes:
-            course_info = COURSE_CATALOG[course_name]
-            
-            st.markdown('<div class="enrollment-card">', unsafe_allow_html=True)
-            col1, col2 = st.columns([3, 1])
-            
-            with col1:
-                st.markdown(f"### {course_name}")
-                st.markdown(f"{course_info['description']}")
-                st.markdown(f"**Duration:** {course_info['duration']}")
-                st.markdown(f"**Best for:** {course_info['best_for']}")
-            
-            with col2:
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown(f'<a href="{course_info["url"]}" target="_blank" rel="noopener noreferrer"><strong>🎯 Enroll Now</strong></a>', unsafe_allow_html=True)
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Create summary table
-        st.markdown("## 📋 Enrollment Summary")
-        enrollment_data = []
-        for course_name in st.session_state.selected_classes:
-            course_info = COURSE_CATALOG[course_name]
-            enrollment_data.append({
-                "Class Name": course_name,
-                "Duration": course_info['duration'],
-                "Best For": course_info['best_for'],
-                "Enrollment URL": course_info['url']
-            })
-        
-        enrollment_df = pd.DataFrame(enrollment_data)
-        st.dataframe(
-            enrollment_df, 
-            use_container_width=True, 
-            hide_index=True,
-            column_config={
-                "Enrollment URL": st.column_config.LinkColumn(
-                    "🎯 Enroll Now",
-                    help="Click to enroll in this course",
-                    display_text="Enroll Now"
-                )
-            }
-        )
-        
-        # Contact information
-        st.markdown("## 📞 Need Help?")
-        st.info("**Call Varsity Tutors at (800) 803-4058** for assistance with enrollment or to find the perfect class schedule!")
-        
-    else:
-        st.warning("⚠️ No classes selected. Please go back to select your courses.")
-    
-    # Navigation
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("← Back to Class Selection", key="back_to_step2"):
-            st.session_state.step = 2
-            st.rerun()
-    with col2:
-        if st.button("🔄 Start Over", key="restart"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.rerun()
 
 # Footer
 st.markdown("---")
-st.markdown("**SAT Class Finder** - Connecting students with Varsity Tutors SAT preparation classes")
+st.markdown("**SAT Class Finder** - Connecting students with Varsity Tutors SAT preparation classes") 
