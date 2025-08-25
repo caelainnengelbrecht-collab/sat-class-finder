@@ -605,6 +605,42 @@ elif st.session_state.step == 2:
             ]
             course_dates = review_dates
             
+        elif item['course'] == "SAT Math Cram Session":
+            # Real SAT Math Cram Session dates from Varsity Tutors
+            math_cram_dates = [
+                "Sep 7 @ 5:30 PM CT | 1hr 30min session",
+                "Sep 10 @ 8:00 PM CT | 1hr 30min session", 
+                "Sep 28 @ 5:00 PM CT | 1hr 30min session",
+                "Oct 1 @ 8:00 PM CT | 1hr 30min session",
+                "Nov 2 @ 5:30 PM CT | 1hr 30min session",
+                "Nov 5 @ 8:00 PM CT | 1hr 30min session",
+                "Nov 30 @ 5:30 PM CT | 1hr 30min session",
+                "Mar 8 @ 5:30 PM CT | 1hr 30min session",
+                "Apr 26 @ 5:30 PM CT | 1hr session"
+            ]
+            course_dates = math_cram_dates
+            
+        elif item['course'] == "SAT 4-Week Prep Course":
+            # Real SAT 4-Week Prep Course dates from Varsity Tutors
+            prep_course_dates = [
+                "Sep 4-25 | Thu @ 8:00 PM CT | 6hr total",
+                "Sep 6-27 | Sat @ 10:30 AM CT | 6hr total",
+                "Sep 9-30 | Tue @ 5:00 PM CT | 6hr total",
+                "Oct 9-30 | Thu @ 7:30 PM CT | 6hr total",
+                "Oct 12 - Nov 2 | Sun @ 4:00 PM CT | 6hr total",
+                "Oct 15 - Nov 5 | Wed @ 5:00 PM CT | 6hr total",
+                "Nov 3-24 | Mon @ 8:00 PM CT | 6hr total",
+                "Nov 9-30 | Sun @ 3:30 PM CT | 6hr total",
+                "Nov 11 - Dec 2 | Tue @ 6:00 PM CT | 6hr total",
+                "Feb 15 - Mar 8 | Sun @ 4:00 PM CT | 6hr total",
+                "Feb 18 - Mar 11 | Wed @ 8:00 PM CT | 6hr total",
+                "Apr 4-25 | Sat @ 3:00 PM CT | 6hr total",
+                "Apr 8-29 | Wed @ 4:30 PM CT | 6hr total",
+                "Aug 17 - Sep 7 | Sun @ 4:00 PM CT | 6hr total",
+                "Aug 20 - Sep 10 | Wed @ 6:00 PM CT | 6hr total"
+            ]
+            course_dates = prep_course_dates
+            
         elif "1-Week" in item['course'] or "Cram Session" in item['course']:
             # Short intensive courses - multiple weekly start dates
             for week in range(0, 12):  # Next 3 months
@@ -621,7 +657,7 @@ elif st.session_state.step == 2:
                     course_dates.append(f"{start_date.strftime('%B %d')} - {end_date.strftime('%B %d, %Y')}")
                     
         elif "4-Week" in item['course']:
-            # 4-week courses - monthly start dates
+            # 4-week courses - bi-weekly start dates (fallback for other 4-week courses)
             for month in range(0, 6):  # Next 6 months
                 start_date = today + timedelta(weeks=month*4)
                 if start_date.weekday() == 0:  # Monday start
@@ -726,6 +762,72 @@ elif st.session_state.step == 2:
                         </a>
                         <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
                             Final review of key SAT concepts and strategies
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT Math Cram Session":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           🔢 Join Math Cram: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Intensive SAT Math strategies and problem-solving
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT 4-Week Prep Course":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           📚 Enroll 4-Week Course: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Comprehensive 4-week SAT preparation • Weekly 90min sessions
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT Reading/Writing Cram Session":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           📖 Join Reading/Writing Cram: {selected_date}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Intensive SAT Reading and Writing strategies
                         </p>
                     </div>
                     ''', unsafe_allow_html=True)
