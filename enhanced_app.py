@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from urllib.parse import quote_plus
 from datetime import date, datetime, timedelta
-import plotly.express as px
 
 # =============================================
 #  Enhanced SAT Class Finder 
