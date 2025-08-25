@@ -48,70 +48,26 @@ st.markdown("""
     font-weight: 600;
 }
 
-/* Date selection box styling */
-.date-box {
+/* Date selection button styling - applied dynamically */
+.date-selection-button {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    padding: 24px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
     border-radius: 16px;
+    padding: 24px 20px;
+    min-height: 120px;
+    color: #0f172a;
+    font-size: 14px;
+    white-space: pre-line;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    margin: 12px 0;
-    text-align: center;
     transition: all 0.3s ease;
-    cursor: pointer;
+    text-align: center;
 }
 
-.date-box:hover {
+.date-selection-button:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.date-box.excellent {
-    border-left: 6px solid #22c55e;
-}
-
-.date-box.good {
-    border-left: 6px solid #f59e0b;
-}
-
-.date-box.urgent {
-    border-left: 6px solid #ef4444;
-}
-
-.date-title {
-    font-size: 1.2em;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 8px;
-}
-
-.date-days {
-    font-size: 1em;
-    color: #64748b;
-    margin-bottom: 12px;
-}
-
-.date-status {
-    font-size: 0.9em;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 20px;
-    display: inline-block;
-}
-
-.date-status.excellent {
-    background: rgba(34, 197, 94, 0.1);
-    color: #16a34a;
-}
-
-.date-status.good {
-    background: rgba(245, 158, 11, 0.1);
-    color: #d97706;
-}
-
-.date-status.urgent {
-    background: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 /* Enrollment link styling */
@@ -283,23 +239,47 @@ if st.session_state.step == 1:
                 status_class = "urgent"
             
             with col:
-                # Create clickable date box
-                date_box_html = f"""
-                <div class="date-box {status_class}">
-                    <div class="date-title">{date_str}</div>
-                    <div class="date-days">{days_until} days from now</div>
-                    <div class="date-status {status_class}">{status_text}</div>
-                </div>
-                """
-                st.markdown(date_box_html, unsafe_allow_html=True)
+                # Add custom CSS for this specific button
+                border_color = '#22c55e' if status_class == 'excellent' else '#f59e0b' if status_class == 'good' else '#ef4444'
+                status_bg = 'rgba(34, 197, 94, 0.1)' if status_class == 'excellent' else 'rgba(245, 158, 11, 0.1)' if status_class == 'good' else 'rgba(239, 68, 68, 0.1)'
+                status_color = '#16a34a' if status_class == 'excellent' else '#d97706' if status_class == 'good' else '#dc2626'
                 
-                # Button for selection
-                if st.button(f"Choose {date_str}", key=f"date_{i}", use_container_width=True):
+                st.markdown(f"""
+                <style>
+                    div[data-testid="column"]:nth-child({(col_index % 2) + 1}) .stButton:last-child button {{
+                        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+                        border: 2px solid rgba(226, 232, 240, 0.8) !important;
+                        border-left: 6px solid {border_color} !important;
+                        border-radius: 16px !important;
+                        padding: 24px 20px !important;
+                        height: auto !important;
+                        min-height: 120px !important;
+                        color: #0f172a !important;
+                        font-size: 14px !important;
+                        white-space: pre-line !important;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+                        transition: all 0.3s ease !important;
+                    }}
+                    div[data-testid="column"]:nth-child({(col_index % 2) + 1}) .stButton:last-child button:hover {{
+                        transform: translateY(-4px) !important;
+                        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
+                        border-color: #3b82f6 !important;
+                        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+                    }}
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # Button with date information formatted nicely
+                button_text = f"{date_str}\n{days_until} days from now\n{status_text}"
+                
+                if st.button(button_text, 
+                           key=f"date_{i}", 
+                           use_container_width=True,
+                           help=f"Click to select {date_str} as your SAT test date"):
                     st.session_state.test_date = date_str
                     st.session_state.step = 2
                     st.rerun()
                 
-                # Add some spacing
                 st.markdown("<br>", unsafe_allow_html=True)
             
             col_index += 1
