@@ -555,14 +555,55 @@ elif st.session_state.step == 2:
         today = date.today()
         
         if item['course'] == "Proctored Practice SAT":
-            # Generate upcoming Saturday dates for Proctored Practice SAT
-            for week in range(0, 16):  # Next 4 months of Saturdays
-                days_until_saturday = (5 - today.weekday()) % 7
-                if days_until_saturday == 0 and week == 0:  # Today is Saturday, start with next week
-                    days_until_saturday = 7
-                saturday_date = today + timedelta(days=days_until_saturday + (week * 7))
-                if saturday_date > today:  # Only future dates
-                    course_dates.append(f"Saturday, {saturday_date.strftime('%B %d, %Y')}")
+            # Real SAT Proctored Practice Test dates from Varsity Tutors
+            proctored_dates = [
+                "August 30 at 11:00 AM ET",
+                "September 6 at 10:00 AM ET", 
+                "September 13 at 11:00 AM ET",
+                "September 20 at 11:00 AM ET",
+                "September 27 at 10:00 AM ET",
+                "September 27 at 12:00 PM ET",
+                "October 4 at 11:00 AM ET",
+                "October 11 at 10:00 AM ET",
+                "October 18 at 11:00 AM ET",
+                "October 25 at 12:00 PM ET",
+                "November 1 at 11:00 AM ET",
+                "November 8 at 10:00 AM ET",
+                "November 15 at 11:00 AM ET",
+                "November 22 at 12:00 PM ET",
+                "November 29 at 10:00 AM ET",
+                "December 13 at 11:00 AM ET",
+                "December 20 at 12:00 PM ET",
+                "December 27 at 11:00 AM ET"
+            ]
+            course_dates = proctored_dates
+            
+        elif item['course'] == "SAT 2-Week Bootcamp":
+            # Real SAT 2-Week Bootcamp dates from Varsity Tutors
+            bootcamp_dates = [
+                "Aug 31 - Sep 10 | Sun, Mon, Tue, Wed @ 5:30 PM CT",
+                "Sep 21 - Oct 1 | Sun, Mon, Tue, Wed @ 6:00 PM CT", 
+                "Oct 27 - Nov 6 | Mon, Tue, Wed, Thu @ 6:00 PM CT",
+                "Mar 1 - Mar 11 | Sun, Mon, Tue, Wed @ 6:00 PM CT",
+                "Apr 19 - Apr 29 | Sun, Mon, Tue, Wed @ 6:00 PM CT"
+            ]
+            course_dates = bootcamp_dates
+            
+        elif item['course'] == "Ultimate SAT Review Session":
+            # Real Ultimate SAT Review Session dates from Varsity Tutors
+            review_dates = [
+                "September 6 at 12:00 PM ET",
+                "September 9 at 8:00 PM ET",
+                "September 27 at 10:00 AM ET",
+                "September 30 at 8:00 PM ET",
+                "November 1 at 2:00 PM ET",
+                "November 4 at 8:30 PM ET",
+                "November 29 at 1:00 PM ET",
+                "December 2 at 8:00 PM ET",
+                "March 7 at 1:00 PM ET",
+                "April 25 at 12:00 PM ET"
+            ]
+            course_dates = review_dates
             
         elif "1-Week" in item['course'] or "Cram Session" in item['course']:
             # Short intensive courses - multiple weekly start dates
@@ -616,7 +657,7 @@ elif st.session_state.step == 2:
             
             selected_date = st.selectbox(
                 f"Choose date for {item['course']}",
-                options=["Select a date..."] + course_dates[:8],  # Limit to 8 options
+                options=["Select a date..."] + course_dates,  # Show all available dates
                 key=f"schedule_date_{i}",
                 label_visibility="collapsed"
             )
@@ -637,8 +678,55 @@ elif st.session_state.step == 2:
                                font-weight: 600;
                                font-size: 0.9em;
                            ">
-                           🎯 Enroll for {selected_date}
+                           📝 Join Practice Test: {selected_date}
                         </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            3-hour proctored SAT under real test conditions
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "SAT 2-Week Bootcamp":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           🚀 Enroll in Bootcamp: {selected_date.split(' |')[0]}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Intensive 2-week SAT prep with 4 sessions per week
+                        </p>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif item['course'] == "Ultimate SAT Review Session":
+                    enrollment_url = COURSE_CATALOG.get(item['course'], {}).get('url', '#')
+                    st.markdown(f'''
+                    <div style="margin-top: 8px;">
+                        <a href="{enrollment_url}" 
+                           target="_blank" 
+                           style="
+                               background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                               color: white;
+                               padding: 8px 16px;
+                               border-radius: 6px;
+                               text-decoration: none;
+                               font-weight: 600;
+                               font-size: 0.9em;
+                           ">
+                           🎯 Join Review Session: {selected_date}
+                        </a>
+                        <p style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">
+                            Final review of key SAT concepts and strategies
+                        </p>
                     </div>
                     ''', unsafe_allow_html=True)
                 else:
@@ -650,7 +738,7 @@ elif st.session_state.step == 2:
                             <a href="{enrollment_url}" 
                                target="_blank" 
                                style="
-                                   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
                                    color: white;
                                    padding: 8px 16px;
                                    border-radius: 6px;
