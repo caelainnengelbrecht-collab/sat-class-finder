@@ -47,6 +47,23 @@ st.markdown("""
     padding: 12px 24px;
     font-weight: 600;
 }
+
+/* Enrollment link styling */
+.enrollment-card a {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white !important;
+    text-decoration: none !important;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.enrollment-card a:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    transform: translateY(-2px);
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -284,6 +301,7 @@ elif st.session_state.step == 3:
     
     if st.session_state.selected_classes:
         st.markdown("## 🎓 Your Selected Classes")
+        st.info("📌 **How to Enroll:** Click the 'Enroll Now' buttons below. Each link will open the official Varsity Tutors course page in a new tab where you can view available class times and complete your enrollment.")
         st.markdown("**Click the 'Enroll Now' buttons to register for your classes:**")
         
         # Create enrollment cards for each selected class
@@ -301,7 +319,7 @@ elif st.session_state.step == 3:
             
             with col2:
                 st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown(f"[**🎯 Enroll Now**]({course_info['url']})")
+                st.markdown(f'<a href="{course_info["url"]}" target="_blank" rel="noopener noreferrer"><strong>🎯 Enroll Now</strong></a>', unsafe_allow_html=True)
             
             st.markdown('</div>', unsafe_allow_html=True)
         
@@ -314,7 +332,7 @@ elif st.session_state.step == 3:
                 "Class Name": course_name,
                 "Duration": course_info['duration'],
                 "Best For": course_info['best_for'],
-                "Enroll": f"[Click Here]({course_info['url']})"
+                "Enrollment URL": course_info['url']
             })
         
         enrollment_df = pd.DataFrame(enrollment_data)
@@ -323,9 +341,10 @@ elif st.session_state.step == 3:
             use_container_width=True, 
             hide_index=True,
             column_config={
-                "Enroll": st.column_config.LinkColumn(
+                "Enrollment URL": st.column_config.LinkColumn(
                     "🎯 Enroll Now",
-                    help="Click to enroll in this course"
+                    help="Click to enroll in this course",
+                    display_text="Enroll Now"
                 )
             }
         )
