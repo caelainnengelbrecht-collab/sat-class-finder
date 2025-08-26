@@ -101,6 +101,11 @@ if 'test_date' not in st.session_state:
     st.session_state.test_date = None
 if 'selected_classes' not in st.session_state:
     st.session_state.selected_classes = []
+if 'availability' not in st.session_state:
+    st.session_state.availability = {
+        'days': [],  # List of selected days (Monday, Tuesday, etc.)
+        'times': []  # List of selected time slots
+    }
 
 # SAT Test Dates
 SAT_DATES = {
@@ -121,77 +126,174 @@ COURSE_CATALOG = {
         "description": "Intensive 2-week prep course focusing on SAT strategies and key concepts",
         "duration": "2 weeks, 4x per week",
         "best_for": "Fast-track preparation",
-        "recommended_timeline": "urgent"
+        "recommended_timeline": "urgent",
+        "available_times": [
+            "Aug 31 - Sep 10: Sun, Mon, Tue, Wed @ 6:30 PM ET",
+            "Sep 21 - Oct 1: Sun, Mon, Tue, Wed @ 7:00 PM ET",
+            "Oct 27 - Nov 6: Mon, Tue, Wed, Thu @ 7:00 PM ET",
+            "Mar 1 - Mar 11: Sun, Mon, Tue, Wed @ 7:00 PM ET",
+            "Apr 19 - Apr 29: Sun, Mon, Tue, Wed @ 7:00 PM ET"
+        ]
     },
     "SAT 4-Week Prep Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-four-week-prep-course/dp/e3a6e856-31db-429d-a52f-dfbbc93c2edd", 
         "description": "Comprehensive 4-week SAT preparation covering all sections",
         "duration": "4 weeks",
         "best_for": "Thorough preparation with moderate timeline",
-        "recommended_timeline": "good"
+        "recommended_timeline": "good",
+        "available_times": [
+            "Sep 4 - Sep 25: Thu @ 9:00 PM ET",
+            "Sep 6 - Sep 27: Sat @ 11:30 AM ET",
+            "Sep 9 - Sep 30: Tue @ 6:00 PM ET",
+            "Oct 9 - Oct 30: Thu @ 8:30 PM ET",
+            "Oct 12 - Nov 2: Sun @ 5:00 PM ET",
+            "Oct 15 - Nov 5: Wed @ 6:00 PM ET",
+            "Nov 3 - Nov 24: Mon @ 9:00 PM ET",
+            "Nov 9 - Nov 30: Sun @ 4:30 PM ET",
+            "Nov 11 - Dec 2: Tue @ 7:00 PM ET"
+        ]
     },
     "SAT Prep Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-prep-course/dp/c85c2298-bd6a-4cd4-be0d-8f4f35d3f7eb",
         "description": "Extended comprehensive SAT preparation course",
         "duration": "8+ weeks",
         "best_for": "Complete preparation with plenty of time",
-        "recommended_timeline": "excellent"
+        "recommended_timeline": "excellent",
+        "available_times": [
+            "Sep 11 - Oct 30: Thu @ 5:30 PM ET",
+            "Sep 13 - Nov 1: Sat @ 12:00 PM ET",
+            "Sep 16 - Nov 4: Tue @ 8:00 PM ET",
+            "Oct 7 - Nov 25: Tue @ 5:30 PM ET",
+            "Oct 11 - Nov 29: Sat @ 10:00 AM ET",
+            "Oct 13 - Dec 1: Mon @ 8:00 PM ET"
+        ]
     },
     "SAT Math Cram Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-math-cram-session/dp/33f2fab0-1908-4b5c-9d36-966e467af942",
         "description": "Intensive focus on SAT Math section concepts and strategies",
         "duration": "Intensive session",
         "best_for": "Math section improvement",
-        "recommended_timeline": "all"
+        "recommended_timeline": "all",
+        "available_times": [
+            "Sep 7: Sun @ 6:30 PM ET",
+            "Sep 10: Wed @ 9:00 PM ET",
+            "Sep 28: Sun @ 6:00 PM ET",
+            "Oct 1: Wed @ 9:00 PM ET",
+            "Nov 2: Sun @ 6:30 PM ET",
+            "Nov 5: Wed @ 9:00 PM ET",
+            "Nov 30: Sun @ 6:30 PM ET"
+        ]
     },
     "SAT Reading/Writing Cram Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-reading-writing-cram-session/dp/03ea8fe7-ff75-4b07-b69e-f3558c1ed44e",
         "description": "Intensive focus on SAT Reading and Writing sections",
         "duration": "Intensive session", 
         "best_for": "Reading and Writing improvement",
-        "recommended_timeline": "all"
+        "recommended_timeline": "all",
+        "available_times": [
+            "Sep 7: Sun @ 4:30 PM ET",
+            "Sep 8: Mon @ 7:00 PM ET",
+            "Sep 28: Sun @ 6:00 PM ET",
+            "Sep 29: Mon @ 7:00 PM ET",
+            "Nov 2: Sun @ 4:30 PM ET",
+            "Nov 3: Mon @ 7:30 PM ET",
+            "Nov 30: Sun @ 5:30 PM ET",
+            "Dec 1: Mon @ 7:30 PM ET"
+        ]
     },
     "1-Week SAT Math Bootcamp": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-math-9-12/dp/255ad018-d421-46fb-9e54-210e4045a491",
         "description": "One week intensive bootcamp focused on SAT Math",
         "duration": "1 week",
         "best_for": "Math-focused intensive preparation",
-        "recommended_timeline": "urgent"
+        "recommended_timeline": "urgent",
+        "available_times": [
+            "Sep 7-10: Sun, Mon, Tue, Wed @ 8:00 PM ET",
+            "Sep 28 - Oct 1: Sun, Mon, Tue, Wed @ 8:00 PM ET",
+            "Nov 2-5: Sun, Mon, Tue, Wed @ 8:30 PM ET",
+            "Nov 30 - Dec 3: Sun, Mon, Tue, Wed @ 8:30 PM ET",
+            "Dec 27-30: Sat, Sun, Mon, Tue @ 2:00 PM ET",
+            "Mar 8-11: Sun, Mon, Tue, Wed @ 8:30 PM ET"
+        ]
     },
     "1-Week SAT ELA Bootcamp": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-ela-9-12/dp/a4621f0a-e935-46ad-beda-de37624b05ba",
         "description": "One week intensive bootcamp focused on SAT Reading and Writing",
         "duration": "1 week",
         "best_for": "Reading and Writing intensive preparation", 
-        "recommended_timeline": "urgent"
+        "recommended_timeline": "urgent",
+        "available_times": [
+            "Sep 7-10: Sun, Mon, Tue, Wed @ 8:00 PM ET",
+            "Sep 28 - Oct 1: Sun, Mon, Tue, Wed @ 8:00 PM ET",
+            "Nov 2-5: Sun, Mon, Tue, Wed @ 8:30 PM ET",
+            "Nov 30 - Dec 3: Sun, Mon, Tue, Wed @ 8:30 PM ET",
+            "Dec 27-30: Sat, Sun, Mon, Tue @ 2:00 PM ET",
+            "Mar 8-11: Sun, Mon, Tue, Wed @ 8:30 PM ET"
+        ]
     },
     "2-Week SAT Math Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-math-sat-9-12/dp/2f67b5be-e283-406f-b4d2-fe3fc17e52aa",
         "description": "Two week intensive course focused on SAT Math",
         "duration": "2 weeks",
         "best_for": "Extended math preparation",
-        "recommended_timeline": "good"
+        "recommended_timeline": "good",
+        "available_times": [
+            "Sep 4-11: Thu @ 8:00 PM ET",
+            "Sep 20-27: Sat @ 3:30 PM ET",
+            "Oct 26 - Nov 2: Sun @ 1:00 PM ET",
+            "Nov 23-30: Sun @ 2:00 PM ET"
+        ]
     },
     "2-Week SAT ELA Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-ela-sat-9-12/dp/81b322ee-93b3-4389-88af-bf11f7d0240f",
         "description": "Two week intensive course focused on SAT Reading and Writing",
         "duration": "2 weeks", 
         "best_for": "Extended reading and writing preparation",
-        "recommended_timeline": "good"
+        "recommended_timeline": "good",
+        "available_times": [
+            "Sep 4-11: Thu @ 8:00 PM ET",
+            "Sep 20-27: Sat @ 3:30 PM ET",
+            "Oct 26 - Nov 2: Sun @ 1:00 PM ET",
+            "Nov 23-30: Sun @ 2:00 PM ET"
+        ]
     },
     "Ultimate SAT Review Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-ultimate-sat-review-session/dp/2a08c912-0a50-4639-b097-dfcaa2f591de",
         "description": "Comprehensive review of key SAT concepts and strategies",
         "duration": "Single intensive session",
         "best_for": "Final review before test",
-        "recommended_timeline": "all"
+        "recommended_timeline": "all",
+        "available_times": [
+            "Sep 6: Fri @ 1:00 PM ET",
+            "Sep 9: Mon @ 9:00 PM ET",
+            "Sep 27: Fri @ 11:00 AM ET",
+            "Sep 30: Mon @ 9:00 PM ET",
+            "Nov 1: Fri @ 3:00 PM ET",
+            "Nov 4: Mon @ 9:30 PM ET",
+            "Nov 29: Fri @ 2:00 PM ET",
+            "Dec 2: Mon @ 9:00 PM ET"
+        ]
     },
     "Proctored Practice SAT": {
         "url": "https://www.varsitytutors.com/courses/vtp-proctored-practiced-sat-9-12/dp/2298ff50-8011-48e7-acc0-c81cb25eeae1",
         "description": "Practice SAT tests under real testing conditions - 3 hour sessions",
         "duration": "3 hours per session",
         "best_for": "Test practice and timing under real conditions",
-        "recommended_timeline": "all"
+        "recommended_timeline": "all",
+        "available_times": [
+            "Aug 30: Fri @ 12:00 PM ET",
+            "Sep 6: Fri @ 11:00 AM ET",
+            "Sep 13: Fri @ 12:00 PM ET",
+            "Sep 20: Fri @ 12:00 PM ET",
+            "Sep 27: Fri @ 11:00 AM ET",
+            "Oct 4: Fri @ 12:00 PM ET",
+            "Oct 11: Fri @ 11:00 AM ET",
+            "Oct 18: Fri @ 12:00 PM ET",
+            "Nov 1: Fri @ 12:00 PM ET",
+            "Nov 8: Fri @ 11:00 AM ET",
+            "Nov 15: Fri @ 12:00 PM ET",
+            "Dec 13: Fri @ 12:00 PM ET"
+        ]
     },
     "PSAT Prep Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-psat-prep-course/dp/50f02afb-2b2b-4f69-8057-dc5b9c53c629",
@@ -237,8 +339,58 @@ COURSE_CATALOG = {
     }
 }
 
+# Helper function to check if course matches availability
+def matches_availability(course_times, selected_days, selected_times):
+    """
+    Check if any of the course times match the user's selected availability
+    """
+    if not selected_days and not selected_times:
+        return True  # Show all if no filters selected
+    
+    day_mapping = {
+        'Monday': 'Mon', 'Tuesday': 'Tue', 'Wednesday': 'Wed', 
+        'Thursday': 'Thu', 'Friday': 'Fri', 'Saturday': 'Sat', 'Sunday': 'Sun'
+    }
+    
+    for time_slot in course_times:
+        time_lower = time_slot.lower()
+        
+        # Check days
+        if selected_days:
+            day_match = False
+            for day in selected_days:
+                short_day = day_mapping.get(day, day[:3].lower())
+                if short_day.lower() in time_lower:
+                    day_match = True
+                    break
+            if not day_match:
+                continue
+        
+        # Check times (simplified matching)
+        if selected_times:
+            time_match = False
+            for time_period in selected_times:
+                if time_period == "Morning" and any(hour in time_slot for hour in ["10:00 AM", "11:00 AM", "12:00 PM"]):
+                    time_match = True
+                elif time_period == "Early Afternoon" and any(hour in time_slot for hour in ["12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM"]):
+                    time_match = True
+                elif time_period == "Late Afternoon" and any(hour in time_slot for hour in ["3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"]):
+                    time_match = True
+                elif time_period == "Evening" and any(hour in time_slot for hour in ["6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM"]):
+                    time_match = True
+                elif time_period == "Night" and any(hour in time_slot for hour in ["9:00 PM", "10:00 PM", "11:00 PM"]):
+                    time_match = True
+            
+            if not time_match:
+                continue
+        
+        # If we get here, this time slot matches both day and time criteria
+        return True
+    
+    return False
+
 # Progress indicator
-progress_labels = ["Choose Test Date", "Your SAT Prep Journey"]
+progress_labels = ["Choose Test Date", "Select Your Availability", "Your SAT Prep Journey"]
 progress = st.session_state.step / len(progress_labels)
 st.progress(progress, text=f"Step {st.session_state.step} of {len(progress_labels)}: {progress_labels[st.session_state.step-1]}")
 
@@ -416,8 +568,124 @@ if st.session_state.step == 1:
         </div>
         ''', unsafe_allow_html=True)
 
-# Step 2: Class Selection
+# Step 2: Availability Selection
 elif st.session_state.step == 2:
+    # Hero section for availability selection
+    st.markdown('''
+    <div style="
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        padding: 60px 30px;
+        margin: -1rem -1rem 2rem -1rem;
+        border-radius: 0 0 20px 20px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    ">
+        <h1 style="font-size: 3em; margin: 0; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+            📅 When Are You Available?
+        </h1>
+        <p style="font-size: 1.3em; margin: 20px 0 0 0; opacity: 0.9;">
+            Select the days and times that work for your schedule
+        </p>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    st.markdown("### 📆 Select Your Available Days")
+    st.markdown("*Choose all days when you could attend SAT prep classes:*")
+    
+    # Day selection using checkboxes
+    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    
+    col1, col2, col3, col4 = st.columns(4)
+    selected_days = []
+    
+    with col1:
+        if st.checkbox("Monday", key="day_monday"):
+            selected_days.append("Monday")
+        if st.checkbox("Tuesday", key="day_tuesday"):
+            selected_days.append("Tuesday")
+    
+    with col2:
+        if st.checkbox("Wednesday", key="day_wednesday"):
+            selected_days.append("Wednesday")
+        if st.checkbox("Thursday", key="day_thursday"):
+            selected_days.append("Thursday")
+    
+    with col3:
+        if st.checkbox("Friday", key="day_friday"):
+            selected_days.append("Friday")
+        if st.checkbox("Saturday", key="day_saturday"):
+            selected_days.append("Saturday")
+            
+    with col4:
+        if st.checkbox("Sunday", key="day_sunday"):
+            selected_days.append("Sunday")
+    
+    st.markdown("---")
+    st.markdown("### ⏰ Select Your Available Time Slots")
+    st.markdown("*Choose all time periods when you could attend classes:*")
+    
+    # Time slot selection
+    time_slots = [
+        "Morning (9:00 AM - 12:00 PM)",
+        "Early Afternoon (12:00 PM - 3:00 PM)", 
+        "Late Afternoon (3:00 PM - 6:00 PM)",
+        "Evening (6:00 PM - 9:00 PM)",
+        "Night (9:00 PM - 11:00 PM)"
+    ]
+    
+    selected_times = []
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.checkbox("Morning (9:00 AM - 12:00 PM)", key="time_morning"):
+            selected_times.append("Morning")
+        if st.checkbox("Early Afternoon (12:00 PM - 3:00 PM)", key="time_early_afternoon"):
+            selected_times.append("Early Afternoon")
+        if st.checkbox("Late Afternoon (3:00 PM - 6:00 PM)", key="time_late_afternoon"):
+            selected_times.append("Late Afternoon")
+    
+    with col2:
+        if st.checkbox("Evening (6:00 PM - 9:00 PM)", key="time_evening"):
+            selected_times.append("Evening")
+        if st.checkbox("Night (9:00 PM - 11:00 PM)", key="time_night"):
+            selected_times.append("Night")
+    
+    # Update session state
+    st.session_state.availability['days'] = selected_days
+    st.session_state.availability['times'] = selected_times
+    
+    # Show current selection
+    if selected_days or selected_times:
+        st.markdown("---")
+        st.markdown("### ✅ Your Current Selection:")
+        if selected_days:
+            st.markdown(f"**Available Days:** {', '.join(selected_days)}")
+        if selected_times:
+            st.markdown(f"**Available Times:** {', '.join(selected_times)}")
+    
+    # Navigation buttons
+    col1, col2, col3 = st.columns([1, 1, 1])
+    
+    with col1:
+        if st.button("← Back to Test Date", key="back_to_step1_from_availability", use_container_width=True):
+            st.session_state.step = 1
+            st.rerun()
+    
+    with col3:
+        if st.button("Continue to Your Journey →", key="continue_to_journey", use_container_width=True):
+            if not selected_days and not selected_times:
+                st.error("Please select at least one day or time slot to continue.")
+            else:
+                st.session_state.step = 3
+                st.rerun()
+    
+    # Show helpful message if no selections made
+    if not selected_days and not selected_times:
+        st.info("💡 **Tip:** Select your available days and times to see personalized class recommendations that fit your schedule!")
+
+# Step 3: Class Selection and Journey
+elif st.session_state.step == 3:
     target_date_obj = SAT_DATES[st.session_state.test_date]
     days_until = (target_date_obj - date.today()).days
     
@@ -470,6 +738,16 @@ elif st.session_state.step == 2:
             {"weeks": "Ongoing", "course": "Proctored Practice SAT", "focus": "Test Practice", "icon": "📝"}
         ]
         
+        # Filter schedule based on availability
+        if st.session_state.availability['days'] or st.session_state.availability['times']:
+            filtered_schedule = []
+            for item in schedule:
+                course_info = COURSE_CATALOG.get(item['course'], {})
+                course_times = course_info.get('available_times', [])
+                if matches_availability(course_times, st.session_state.availability['days'], st.session_state.availability['times']):
+                    filtered_schedule.append(item)
+            schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
+        
     elif days_until > 28:
         timeline_status = "good"
         timeline_color = "#f59e0b"
@@ -490,6 +768,16 @@ elif st.session_state.step == 2:
             {"weeks": "Weekly", "course": "Proctored Practice SAT", "focus": "Practice Tests", "icon": "📝"}
         ]
         
+        # Filter schedule based on availability
+        if st.session_state.availability['days'] or st.session_state.availability['times']:
+            filtered_schedule = []
+            for item in schedule:
+                course_info = COURSE_CATALOG.get(item['course'], {})
+                course_times = course_info.get('available_times', [])
+                if matches_availability(course_times, st.session_state.availability['days'], st.session_state.availability['times']):
+                    filtered_schedule.append(item)
+            schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
+        
     else:
         timeline_status = "urgent"
         timeline_color = "#ef4444"
@@ -509,6 +797,34 @@ elif st.session_state.step == 2:
             {"weeks": "Final Days", "course": "Ultimate SAT Review Session", "focus": "Last Review", "icon": "🎯"},
             {"weeks": "Ongoing", "course": "Proctored Practice SAT", "focus": "Practice", "icon": "📝"}
         ]
+        
+        # Filter schedule based on availability
+        if st.session_state.availability['days'] or st.session_state.availability['times']:
+            filtered_schedule = []
+            for item in schedule:
+                course_info = COURSE_CATALOG.get(item['course'], {})
+                course_times = course_info.get('available_times', [])
+                if matches_availability(course_times, st.session_state.availability['days'], st.session_state.availability['times']):
+                    filtered_schedule.append(item)
+            schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
+    
+    # Show availability filtering info
+    if st.session_state.availability['days'] or st.session_state.availability['times']:
+        selected_days = st.session_state.availability['days']
+        selected_times = st.session_state.availability['times']
+        
+        if selected_days and selected_times:
+            availability_text = f"Filtered for: {', '.join(selected_days)} • {', '.join(selected_times)}"
+        elif selected_days:
+            availability_text = f"Filtered for: {', '.join(selected_days)}"
+        else:
+            availability_text = f"Filtered for: {', '.join(selected_times)}"
+            
+        st.info(f"📅 **{availability_text}** - Only showing classes that match your schedule!")
+        
+        original_schedule_count = 5  # Approximate original schedule size
+        if len(schedule) < original_schedule_count:
+            st.warning(f"⚠️ Some classes were filtered out due to schedule conflicts. Showing {len(schedule)} of {original_schedule_count} recommended classes.")
     
     # Display SAT prep journey timeline
     st.markdown(f'''
@@ -577,8 +893,29 @@ elif st.session_state.step == 2:
             course_desc = COURSE_CATALOG.get(item['course'], {}).get('description', 'Complete your SAT preparation with this essential course.')
             st.info(f"📚 {course_desc}")
             
-            # Enrollment button
+            # Available times - prominently displayed
             course_info = COURSE_CATALOG.get(item['course'], {})
+            if course_info and course_info.get('available_times'):
+                st.markdown("#### 🕒 Available Class Times:")
+                times_col1, times_col2 = st.columns(2)
+                
+                available_times = course_info.get('available_times', [])
+                mid_point = len(available_times) // 2
+                
+                with times_col1:
+                    for time_slot in available_times[:mid_point]:
+                        st.markdown(f"• **{time_slot}**")
+                        
+                with times_col2:
+                    for time_slot in available_times[mid_point:]:
+                        st.markdown(f"• **{time_slot}**")
+                        
+                if len(available_times) > 4:
+                    st.markdown("*Additional times may be available - click to view all options*")
+            else:
+                st.warning("⏰ Contact Varsity Tutors for available times")
+            
+            # Enrollment button  
             if course_info and course_info.get('url'):
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
@@ -591,7 +928,7 @@ elif st.session_state.step == 2:
                            🎯 Enroll in Step {step_number}
                         </a>
                         <p style="color: #6b7280; font-size: 0.9em; margin-top: 10px; font-style: italic;">
-                            Click to view available class times and enroll at Varsity Tutors
+                            Select your preferred time slot and enroll at Varsity Tutors
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -611,8 +948,8 @@ elif st.session_state.step == 2:
     # Navigation back to step 1
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if st.button("← Back to Test Date Selection", key="back_to_step1", use_container_width=True):
-            st.session_state.step = 1
+        if st.button("← Back to Availability Selection", key="back_to_step2", use_container_width=True):
+            st.session_state.step = 2
             st.rerun()
 
 # Footer
