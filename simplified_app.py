@@ -1,1672 +1,884 @@
 import streamlit as st
-import pandas as pd
-from datetime import date, datetime, timedelta
+from datetime import date
 
 # =============================================
-#  Simplified SAT Class Finder 
-#  Connect students with Varsity Tutors SAT classes
+#  SAT Class Finder — UX v4
+#  Clear navigation, accessible visuals, safe CSS
 # =============================================
 
 st.set_page_config(page_title="SAT Class Finder", page_icon="📚", layout="wide")
 
-# Professional Design System
-st.markdown("""
+# ==========================
+# Design System (CSS)
+# ==========================
+st.markdown(
+    """
 <style>
-/* Design System */
 :root {
-    /* Color system */
-    --bg: #f7f9fc;            /* app canvas */
-    --surface: #ffffff;       /* cards */
-    --ink: #0f172a;           /* primary text */
-    --ink-muted: #475569;     /* secondary text */
-    --primary: #2563eb;       /* accent (links, buttons) */
-    --primary-ink: #ffffff;   /* on-primary */
-    --border: #e2e8f0;        /* hairlines */
-    --info-bg: #e8f0ff;       /* light info banner */
-    --info-ink: #1d4ed8;
-
-    /* Radii & elevation */
-    --radius-sm: .5rem;       /* 8px */
-    --radius-lg: 1rem;        /* 16px */
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
-    --shadow-md: 0 6px 16px rgba(15, 23, 42, .08);
-
-    /* Type scale (clamp for responsive) */
-    --h1: clamp(2rem, 1.5rem + 2vw, 3rem);
-    --h2: clamp(1.25rem, 1rem + 1.2vw, 1.75rem);
-    --h3: 1.125rem;
-    --body: 1rem;
-    --small: .9375rem;
-
-    /* Spacing (8pt grid) */
-    --s-1: .5rem;
-    --s-2: 1rem;
-    --s-3: 1.5rem;
-    --s-4: 2rem;
+  /* Base */
+  --bg:#f8fafc; --surface:#ffffff; --ink:#0f172a; --ink-muted:#475569; --border:#e2e8f0;
+  /* Brand */
+  --brand-50:#eff6ff; --brand-100:#dbeafe; --brand-200:#bfdbfe; --brand-300:#93c5fd; --brand-400:#60a5fa;
+  --brand-500:#3b82f6; --brand-600:#2563eb; --brand-700:#1d4ed8; --brand-800:#1e40af; --brand-900:#1e3a8a;
+  /* Semantic */
+  --success-50:#f0fdf4; --success-500:#22c55e; --warning-50:#fffbeb; --warning-500:#f59e0b; --danger-50:#fef2f2; --danger-500:#ef4444;
+  /* Tokens */
+  --radius-sm:.5rem; --radius-lg:1rem; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 6px 16px rgba(15,23,42,.08);
+  --h1:clamp(2rem,1.5rem+2vw,2.75rem); --h2:clamp(1.25rem,1rem+1.2vw,1.6rem); --h3:1.125rem; --body:1rem;
 }
-
-/* Typography */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif!important}
+body{background:var(--bg);color:var(--ink);line-height:1.55}
+.stApp{background:var(--bg)}
+.main>div{max-width:1120px;margin:0 auto;padding:2rem 1rem}
 
-* {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+h1{font-size:var(--h1);font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+h2{font-size:var(--h2);font-weight:700;color:var(--ink)}
+h3{font-size:var(--h3);font-weight:600;color:var(--ink)}
+p,li{font-size:var(--body);color:var(--ink-muted)}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,var(--brand-600),var(--brand-800));color:#fff;padding:2.25rem 1.5rem;margin:-1.25rem -1rem 1.5rem;border-radius:0 0 24px 24px;text-align:center}
+.hero h1{margin:0 0 .5rem 0}
+.hero p{opacity:.95;margin:0}
+
+/* Stepper */
+.stepper{display:flex;gap:1rem;justify-content:center;align-items:center;margin:.5rem 0}
+.stepper .step{display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border:1.5px solid var(--border);border-radius:999px;background:#fff}
+.stepper .step.active{border-color:var(--brand-400);box-shadow:0 0 0 3px var(--brand-100)}
+.stepper .dot{width:10px;height:10px;border-radius:999px;background:var(--brand-600)}
+
+/* Buttons & Inputs */
+.stButton button{background:var(--brand-600)!important;color:#fff!important;border:none!important;border-radius:12px!important;padding:.9rem 1.2rem!important;font-weight:600!important;font-size:.95rem!important;transition:transform .15s ease,box-shadow .15s ease}
+.stButton button:hover{background:var(--brand-700)!important;transform:translateY(-1px)!important;box-shadow:0 4px 12px rgba(2,132,199,.3)!important}
+.stSelectbox > div > div, .stRadio > div, .stMultiSelect > div > div {border-radius:12px!important;border:2px solid var(--border)!important}
+
+/* Info boxes */
+.stInfo{background:var(--brand-50)!important;border-left:4px solid var(--brand-600)!important;border-radius:12px!important}
+.stSuccess{background:var(--success-50)!important;border-left:4px solid var(--success-500)!important;border-radius:12px!important}
+.stWarning{background:var(--warning-50)!important;border-left:4px solid var(--warning-500)!important;border-radius:12px!important}
+
+/* Expanders — fix overlap & stray markers */
+.streamlit-expanderHeader::before,
+.streamlit-expanderHeader::after { content: none !important; }
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+
+.streamlit-expanderHeader{
+  display:flex!important; align-items:center!important; gap:.5rem!important;
+  white-space:normal!important; overflow:hidden!important; text-overflow:ellipsis!important;
+  line-height:1.4!important; min-height:48px; font-weight:700; 
+  padding:.75rem 1rem!important; margin:.5rem 0!important;
+}
+.streamlit-expanderHeader *{min-width:0}
+
+/* Hide the "key" text that Streamlit adds internally */
+.streamlit-expanderHeader span[data-testid]:first-child {
+  display: none !important;
+}
+.streamlit-expanderHeader > span:first-child:not([class]) {
+  display: none !important;
+}
+/* Alternative approach - hide any text that starts with "key" */
+.streamlit-expanderHeader span:first-child {
+  font-size: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
-body {
-    background: var(--bg); 
-    color: var(--ink); 
-    line-height: 1.5; 
-    font-feature-settings: "ss01", "tnum";
+/* Clean expander spacing */
+div[data-testid="stExpander"] {
+  margin: 0.75rem 0 !important;
+  clear: both !important;
+}
+div[data-testid="stExpander"] > div:first-child {
+  margin-bottom: 0.5rem !important;
+}
+/* Prevent text overlap and ensure proper positioning */
+.streamlit-expanderHeader * {
+  vertical-align: baseline !important;
+  line-height: inherit !important;
+  display: inline !important;
+}
+/* Force proper text flow */
+.streamlit-expanderHeader {
+  text-align: left !important;
+  word-wrap: break-word !important;
+}
+/* Additional spacing for all Streamlit containers */
+.element-container {
+  margin-bottom: 0.75rem !important;
+}
+/* Reasonable heading spacing */
+h1, h2, h3, h4, h5, h6 {
+  margin: 1rem 0 0.5rem 0 !important;
+  clear: both !important;
 }
 
-/* Base Layout */
-.stApp {
-    background: var(--bg);
-}
+/* Progress */
+.stProgress > div > div > div > div{background-color:var(--brand-600)!important}
 
-.main > div {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: var(--s-4) var(--s-2);
-}
-
-h1 {
-    font-size: var(--h1); 
-    font-weight: 800; 
-    letter-spacing: -0.01em;
-    color: var(--ink);
-}
-
-h2 {
-    font-size: var(--h2); 
-    font-weight: 700;
-    color: var(--ink);
-}
-
-h3 {
-    font-size: var(--h3); 
-    font-weight: 600;
-    color: var(--ink);
-}
-
-p, li {
-    font-size: var(--body); 
-    color: var(--ink-muted);
-}
-
-/* Stepper Component */
-.stepper {
-    display: grid; 
-    grid-template-columns: repeat(4, 1fr); 
-    gap: var(--s-4); 
-    margin-top: var(--s-2);
-}
-
-.step {
-    display: flex; 
-    gap: 0.75rem; 
-    align-items: center;
-}
-
-.dot {
-    width: 14px; 
-    height: 14px; 
-    border-radius: 999px;
-    background: var(--primary); 
-    box-shadow: 0 0 0 4px #dbeafe;
-}
-
-.step label {
-    font-weight: 600; 
-    color: var(--ink);
-}
-
-.step small {
-    display: block; 
-    color: var(--ink-muted);
-}
-
-@media (max-width: 720px) { 
-    .stepper {
-        grid-template-columns: 1fr 1fr;
-    } 
-}
-
-/* Course Cards */
-.course-card {
-    background: var(--surface); 
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg); 
-    padding: var(--s-3); 
-    box-shadow: var(--shadow-md);
-    margin-bottom: var(--s-3);
-}
-
-.info-banner {
-    background: var(--info-bg); 
-    color: var(--ink);
-    border: 1px solid #dbeafe; 
-    border-radius: var(--radius-lg);
-    padding: var(--s-2); 
-    box-shadow: var(--shadow-sm);
-}
-
-.info-text {
-    color: var(--info-ink);
-}
-
-/* Time slot chips */
-.time-slots {
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
-    gap: var(--s-2); 
-    list-style: none; 
-    padding: 0;
-    margin-top: var(--s-2);
-}
-
-.time-slot {
-    border: 1px solid var(--border); 
-    border-radius: var(--radius-sm); 
-    padding: 0.75rem; 
-    background: var(--surface);
-}
-
-.time-slot-title {
-    font-weight: 600;
-    color: var(--ink);
-}
-
-.time-slot-details {
-    font-size: var(--small); 
-    color: var(--ink-muted);
-}
-
-.step.inactive {
-    background: var(--gray-100);
-    color: var(--gray-500);
-}
-
-.step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    font-weight: 700;
-    font-size: 0.75rem;
-}
-
-/* Hero Section */
-.hero {
-    background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-800) 100%);
-    color: white;
-    padding: 3rem 2rem;
-    margin: -2rem -2rem 2rem -2rem;
-    border-radius: 0 0 24px 24px;
-    text-align: center;
-}
-
-.hero h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0 0 1rem 0;
-    letter-spacing: -0.025em;
-}
-
-.hero p {
-    font-size: 1.125rem;
-    opacity: 0.9;
-    margin: 0;
-    font-weight: 400;
-}
-
-/* Course Cards */
-.course-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-top: 4px solid var(--brand-600);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 150ms ease;
-}
-
-.course-card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-}
-
-.course-card h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    color: var(--gray-900);
-}
-
-.course-card .subtitle {
-    color: var(--gray-600);
-    font-size: 0.875rem;
-    margin: 0 0 1rem 0;
-}
-
-.course-card .description {
-    background: var(--brand-50);
-    padding: 1rem;
-    border-radius: 12px;
-    border-left: 4px solid var(--brand-600);
-    font-size: 0.875rem;
-    color: var(--gray-700);
-    margin: 1rem 0;
-}
-
-/* Time Chips */
-.time-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 1rem 0;
-}
-
-.time-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border: 2px solid var(--gray-200);
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    transition: all 150ms ease;
-    cursor: pointer;
-    background: white;
-    color: var(--gray-700);
-}
-
-.time-chip:hover {
-    border-color: var(--brand-300);
-    background: var(--brand-50);
-}
-
-.time-chip.selected {
-    border-color: var(--brand-600);
-    background: var(--brand-600);
-    color: white;
-}
-
-.time-chip .checkmark {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--success-500);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: white;
-}
-
-/* Buttons */
-.stButton button {
-    background: var(--brand-600) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: 0.875rem 1.5rem !important;
-    font-weight: 600 !important;
-    font-size: 0.875rem !important;
-    transition: all 150ms ease !important;
-    font-family: 'Inter', sans-serif !important;
-}
-
-.stButton button:hover {
-    background: var(--brand-700) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
-}
-
-/* Secondary Button */
-div[data-testid="column"] .stButton button {
-    background: var(--gray-100) !important;
-    color: var(--gray-700) !important;
-}
-
-div[data-testid="column"] .stButton button:hover {
-    background: var(--gray-200) !important;
-    color: var(--gray-800) !important;
-}
-
-/* Primary CTA */
-.primary-cta .stButton button {
-    background: var(--brand-600) !important;
-    color: white !important;
-    font-size: 1rem !important;
-    padding: 1rem 2rem !important;
-}
-
-/* Form Elements */
-.stSelectbox > div > div {
-    border-radius: 12px !important;
-    border: 2px solid var(--gray-200) !important;
-    font-family: 'Inter', sans-serif !important;
-}
-
-.stRadio > div {
-    gap: 0.75rem !important;
-}
-
-.stRadio label {
-    font-weight: 500 !important;
-    font-size: 0.875rem !important;
-}
-
-/* Info/Warning/Error Boxes */
-.stInfo {
-    background: var(--brand-50) !important;
-    border-left: 4px solid var(--brand-600) !important;
-    border-radius: 12px !important;
-}
-
-.stSuccess {
-    background: #f0fdf4 !important;
-    border-left: 4px solid var(--success-500) !important;
-    border-radius: 12px !important;
-}
-
-.stWarning {
-    background: #fffbeb !important;
-    border-left: 4px solid var(--warning-500) !important;
-    border-radius: 12px !important;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in-up {
-    animation: fadeInUp 300ms ease-out;
-}
-
-/* Focus States */
-button:focus,
-.time-chip:focus {
-    outline: 2px solid var(--brand-600);
-    outline-offset: 2px;
-}
-
-/* CTA Button Hover Effects */
-.cta-button:hover {
-    background: var(--brand-700) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
-}
-
-/* Progress Bar Override */
-.stProgress > div > div > div > div {
-    background-color: var(--brand-600) !important;
-}
-
-/* Hide Streamlit Branding */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
+/* Footer/branding */
+#MainMenu, header, footer{visibility:hidden}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
-# Initialize session state
-if 'step' not in st.session_state:
+# ==========================
+# Session State
+# ==========================
+if "step" not in st.session_state:
     st.session_state.step = 1
-if 'test_date' not in st.session_state:
+if "test_date" not in st.session_state:
     st.session_state.test_date = None
-if 'selected_classes' not in st.session_state:
-    st.session_state.selected_classes = []
-if 'availability' not in st.session_state:
+if "availability" not in st.session_state:
     st.session_state.availability = {
-        'day_preference': 'both',  # 'weekdays', 'weekends', or 'both'
-        'time_preference': 'both',  # 'morning', 'evening', or 'both'
-        'filter_enabled': False  # Whether to apply filtering or show all classes
+        "day_preference": "both",
+        "time_preference": "both",
+        "filter_enabled": False,
+        "unavailable_days": [],
     }
 
-# SAT Test Dates
+# ==========================
+# Data
+# ==========================
 SAT_DATES = {
     "August 23, 2025": date(2025, 8, 23),
-    "September 13, 2025": date(2025, 9, 13), 
+    "September 13, 2025": date(2025, 9, 13),
     "October 4, 2025": date(2025, 10, 4),
     "November 8, 2025": date(2025, 11, 8),
     "December 6, 2025": date(2025, 12, 6),
     "March 14, 2026": date(2026, 3, 14),
     "May 2, 2026": date(2026, 5, 2),
-    "June 6, 2026": date(2026, 6, 6)
+    "June 6, 2026": date(2026, 6, 6),
 }
 
-# Varsity Tutors SAT Course Catalog
 COURSE_CATALOG = {
     "SAT 2-Week Bootcamp": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-two-week-bootcamp/dp/e34ad454-d5a7-4851-9694-cdd64675b3d8",
-        "description": "Intensive 2-week prep course focusing on SAT strategies and key concepts",
-        "duration": "2 weeks, 4x per week",
-        "best_for": "Fast-track preparation",
-        "recommended_timeline": "urgent",
+        "description": "Intensive 2-week prep focusing on strategies and key concepts.",
         "available_times": [
             "Aug 31 - Sep 10: Sun, Mon, Tue, Wed @ 6:30 PM ET",
             "Sep 21 - Oct 1: Sun, Mon, Tue, Wed @ 7:00 PM ET",
             "Oct 27 - Nov 6: Mon, Tue, Wed, Thu @ 7:00 PM ET",
-            "Mar 1 - Mar 11: Sun, Mon, Tue, Wed @ 7:00 PM ET",
-            "Apr 19 - Apr 29: Sun, Mon, Tue, Wed @ 7:00 PM ET"
-        ]
+        ],
     },
     "SAT 4-Week Prep Course": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-sat-four-week-prep-course/dp/e3a6e856-31db-429d-a52f-dfbbc93c2edd", 
-        "description": "Comprehensive 4-week SAT preparation covering all sections",
-        "duration": "4 weeks",
-        "best_for": "Thorough preparation with moderate timeline",
-        "recommended_timeline": "good",
+        "url": "https://www.varsitytutors.com/courses/vtpsg-sat-four-week-prep-course/dp/e3a6e856-31db-429d-a52f-dfbbc93c2edd",
+        "description": "Comprehensive 4-week SAT preparation covering all sections.",
         "available_times": [
             "Sep 4 - Sep 25: Thu @ 9:00 PM ET",
-            "Sep 6 - Sep 27: Sat @ 11:30 AM ET",
             "Sep 9 - Sep 30: Tue @ 6:00 PM ET",
             "Oct 9 - Oct 30: Thu @ 8:30 PM ET",
-            "Oct 12 - Nov 2: Sun @ 5:00 PM ET",
-            "Oct 15 - Nov 5: Wed @ 6:00 PM ET",
-            "Nov 3 - Nov 24: Mon @ 9:00 PM ET",
-            "Nov 9 - Nov 30: Sun @ 4:30 PM ET",
-            "Nov 11 - Dec 2: Tue @ 7:00 PM ET"
-        ]
+        ],
     },
     "SAT Prep Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-prep-course/dp/c85c2298-bd6a-4cd4-be0d-8f4f35d3f7eb",
-        "description": "Extended comprehensive SAT preparation course",
-        "duration": "8+ weeks",
-        "best_for": "Complete preparation with plenty of time",
-        "recommended_timeline": "excellent",
+        "description": "Extended comprehensive SAT preparation (8+ weeks).",
         "available_times": [
             "Sep 11 - Oct 30: Thu @ 5:30 PM ET",
-            "Sep 13 - Nov 1: Sat @ 12:00 PM ET",
-            "Sep 16 - Nov 4: Tue @ 8:00 PM ET",
             "Oct 7 - Nov 25: Tue @ 5:30 PM ET",
-            "Oct 11 - Nov 29: Sat @ 10:00 AM ET",
-            "Oct 13 - Dec 1: Mon @ 8:00 PM ET"
-        ]
+            "Oct 13 - Dec 1: Mon @ 8:00 PM ET",
+        ],
     },
     "SAT Math Cram Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-math-cram-session/dp/33f2fab0-1908-4b5c-9d36-966e467af942",
-        "description": "Intensive focus on SAT Math section concepts and strategies",
-        "duration": "Intensive session",
-        "best_for": "Math section improvement",
-        "recommended_timeline": "all",
+        "description": "Focused strategies for the SAT Math section.",
         "available_times": [
             "Sep 7: Sun @ 6:30 PM ET",
-            "Sep 10: Wed @ 9:00 PM ET",
-            "Sep 28: Sun @ 6:00 PM ET",
             "Oct 1: Wed @ 9:00 PM ET",
-            "Nov 2: Sun @ 6:30 PM ET",
-            "Nov 5: Wed @ 9:00 PM ET",
-            "Nov 30: Sun @ 6:30 PM ET"
-        ]
+            "Nov 30: Sun @ 6:30 PM ET",
+        ],
     },
     "SAT Reading/Writing Cram Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-sat-reading-writing-cram-session/dp/03ea8fe7-ff75-4b07-b69e-f3558c1ed44e",
-        "description": "Intensive focus on SAT Reading and Writing sections",
-        "duration": "Intensive session", 
-        "best_for": "Reading and Writing improvement",
-        "recommended_timeline": "all",
+        "description": "Reading and Writing strategies for quick gains.",
         "available_times": [
             "Sep 7: Sun @ 4:30 PM ET",
-            "Sep 8: Mon @ 7:00 PM ET",
-            "Sep 28: Sun @ 6:00 PM ET",
             "Sep 29: Mon @ 7:00 PM ET",
-            "Nov 2: Sun @ 4:30 PM ET",
-            "Nov 3: Mon @ 7:30 PM ET",
             "Nov 30: Sun @ 5:30 PM ET",
-            "Dec 1: Mon @ 7:30 PM ET"
-        ]
-    },
-    "1-Week SAT Math Bootcamp": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-math-9-12/dp/255ad018-d421-46fb-9e54-210e4045a491",
-        "description": "One week intensive bootcamp focused on SAT Math",
-        "duration": "1 week",
-        "best_for": "Math-focused intensive preparation",
-        "recommended_timeline": "urgent",
-        "available_times": [
-            "Sep 7-10: Sun, Mon, Tue, Wed @ 8:00 PM ET",
-            "Sep 28 - Oct 1: Sun, Mon, Tue, Wed @ 8:00 PM ET",
-            "Nov 2-5: Sun, Mon, Tue, Wed @ 8:30 PM ET",
-            "Nov 30 - Dec 3: Sun, Mon, Tue, Wed @ 8:30 PM ET",
-            "Dec 27-30: Sat, Sun, Mon, Tue @ 2:00 PM ET",
-            "Mar 8-11: Sun, Mon, Tue, Wed @ 8:30 PM ET"
-        ]
-    },
-    "1-Week SAT ELA Bootcamp": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-ela-9-12/dp/a4621f0a-e935-46ad-beda-de37624b05ba",
-        "description": "One week intensive bootcamp focused on SAT Reading and Writing",
-        "duration": "1 week",
-        "best_for": "Reading and Writing intensive preparation", 
-        "recommended_timeline": "urgent",
-        "available_times": [
-            "Sep 7-10: Sun, Mon, Tue, Wed @ 8:00 PM ET",
-            "Sep 28 - Oct 1: Sun, Mon, Tue, Wed @ 8:00 PM ET",
-            "Nov 2-5: Sun, Mon, Tue, Wed @ 8:30 PM ET",
-            "Nov 30 - Dec 3: Sun, Mon, Tue, Wed @ 8:30 PM ET",
-            "Dec 27-30: Sat, Sun, Mon, Tue @ 2:00 PM ET",
-            "Mar 8-11: Sun, Mon, Tue, Wed @ 8:30 PM ET"
-        ]
+        ],
     },
     "2-Week SAT Math Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-math-sat-9-12/dp/2f67b5be-e283-406f-b4d2-fe3fc17e52aa",
-        "description": "Two week intensive course focused on SAT Math",
-        "duration": "2 weeks",
-        "best_for": "Extended math preparation",
-        "recommended_timeline": "good",
+        "description": "Two-week intensive course focused on SAT Math.",
         "available_times": [
-            "Sep 4-11: Thu @ 8:00 PM ET",
             "Sep 20-27: Sat @ 3:30 PM ET",
             "Oct 26 - Nov 2: Sun @ 1:00 PM ET",
-            "Nov 23-30: Sun @ 2:00 PM ET"
-        ]
+        ],
     },
     "2-Week SAT ELA Course": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-ela-sat-9-12/dp/81b322ee-93b3-4389-88af-bf11f7d0240f",
-        "description": "Two week intensive course focused on SAT Reading and Writing",
-        "duration": "2 weeks", 
-        "best_for": "Extended reading and writing preparation",
-        "recommended_timeline": "good",
+        "description": "Two-week intensive course for Reading & Writing.",
         "available_times": [
-            "Sep 4-11: Thu @ 8:00 PM ET",
             "Sep 20-27: Sat @ 3:30 PM ET",
             "Oct 26 - Nov 2: Sun @ 1:00 PM ET",
-            "Nov 23-30: Sun @ 2:00 PM ET"
-        ]
+        ],
     },
     "Ultimate SAT Review Session": {
         "url": "https://www.varsitytutors.com/courses/vtpsg-ultimate-sat-review-session/dp/2a08c912-0a50-4639-b097-dfcaa2f591de",
-        "description": "Comprehensive review of key SAT concepts and strategies",
-        "duration": "Single intensive session",
-        "best_for": "Final review before test",
-        "recommended_timeline": "all",
+        "description": "Final review of key concepts and test strategies.",
         "available_times": [
-            "Sep 6: Fri @ 1:00 PM ET",
-            "Sep 9: Mon @ 9:00 PM ET",
             "Sep 27: Fri @ 11:00 AM ET",
-            "Sep 30: Mon @ 9:00 PM ET",
             "Nov 1: Fri @ 3:00 PM ET",
-            "Nov 4: Mon @ 9:30 PM ET",
-            "Nov 29: Fri @ 2:00 PM ET",
-            "Dec 2: Mon @ 9:00 PM ET"
-        ]
+        ],
     },
     "Proctored Practice SAT": {
         "url": "https://www.varsitytutors.com/courses/vtp-proctored-practiced-sat-9-12/dp/2298ff50-8011-48e7-acc0-c81cb25eeae1",
-        "description": "Practice SAT tests under real testing conditions - 3 hour sessions",
-        "duration": "3 hours per session",
-        "best_for": "Test practice and timing under real conditions",
-        "recommended_timeline": "all",
+        "description": "Practice test under realistic timing (3 hours).",
         "available_times": [
-            "Aug 30: Fri @ 12:00 PM ET",
-            "Sep 6: Fri @ 11:00 AM ET",
             "Sep 13: Fri @ 12:00 PM ET",
-            "Sep 20: Fri @ 12:00 PM ET",
-            "Sep 27: Fri @ 11:00 AM ET",
-            "Oct 4: Fri @ 12:00 PM ET",
             "Oct 11: Fri @ 11:00 AM ET",
-            "Oct 18: Fri @ 12:00 PM ET",
-            "Nov 1: Fri @ 12:00 PM ET",
-            "Nov 8: Fri @ 11:00 AM ET",
             "Nov 15: Fri @ 12:00 PM ET",
-            "Dec 13: Fri @ 12:00 PM ET"
-        ]
+        ],
     },
-    "PSAT Prep Course": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-psat-prep-course/dp/50f02afb-2b2b-4f69-8057-dc5b9c53c629",
-        "description": "Comprehensive PSAT preparation course for underclassmen",
-        "duration": "Multiple weeks",
-        "best_for": "PSAT preparation and SAT foundation building",
-        "recommended_timeline": "excellent"
-    },
-    "SAT Math 1-Week Bootcamp": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-math-9-12/dp/255ad018-d421-46fb-9e54-210e4045a491",
-        "description": "Intensive 1-week SAT Math bootcamp with daily sessions",
-        "duration": "1 week, 4 sessions",
-        "best_for": "Intensive Math preparation with limited time",
-        "recommended_timeline": "urgent"
-    },
-    "SAT Reading & Writing 1-Week Bootcamp": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-one-week-bootcamp-sat-ela-9-12/dp/a4621f0a-e935-46ad-beda-de37624b05ba",
-        "description": "Intensive 1-week SAT Reading & Writing bootcamp with daily sessions",
-        "duration": "1 week, 4 sessions",
-        "best_for": "Intensive ELA preparation with limited time", 
-        "recommended_timeline": "urgent"
-    },
-    "SAT 8-Week Prep Class": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-sat-prep-course/dp/c85c2298-bd6a-4cd4-be0d-8f4f35d3f7eb",
-        "description": "Comprehensive 8-week SAT preparation with weekly sessions",
-        "duration": "8 weeks, weekly sessions",
-        "best_for": "Thorough preparation with extended timeline",
-        "recommended_timeline": "excellent"
-    },
-    "SAT 2-Week Math Review Prep Class": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-math-sat-9-12/dp/2f67b5be-e283-406f-b4d2-fe3fc17e52aa",
-        "description": "Focused 2-week Math review and preparation",
-        "duration": "2 weeks, weekly sessions",
-        "best_for": "Math-focused review preparation",
-        "recommended_timeline": "good"
-    },
-    "SAT 2-Week Reading & Writing Review Prep Class": {
-        "url": "https://www.varsitytutors.com/courses/vtpsg-two-week-ela-sat-9-12/dp/81b322ee-93b3-4389-88af-bf11f7d0240f",
-        "description": "Focused 2-week Reading & Writing review and preparation",
-        "duration": "2 weeks, weekly sessions",
-        "best_for": "ELA-focused review preparation",
-        "recommended_timeline": "good"
-    }
 }
 
-# Helper function to check if course matches simplified availability
+# ==========================
+# Helpers
+# ==========================
+DAY_MAP = {
+    'Monday':['mon','monday','mo'], 'Tuesday':['tue','tuesday','tues','tu'], 'Wednesday':['wed','wednesday','we'],
+    'Thursday':['thu','thursday','thurs','th'], 'Friday':['fri','friday','fr'], 'Saturday':['sat','saturday','sa'], 'Sunday':['sun','sunday','su'],
+}
+
 def matches_availability(course_times, day_preference, time_preference, filter_enabled, unavailable_days=None):
-    """
-    Check if any of the course times match the user's simplified availability preferences
-    """
-    if not filter_enabled:
-        return True  # Show all classes if filtering is disabled
-    
-    if unavailable_days is None:
-        unavailable_days = []
-    
-    for time_slot in course_times:
-        time_lower = time_slot.lower()
-        
-        # Enhanced day mapping to catch all possible variants
-        day_mapping = {
-            'Monday': ['mon', 'monday', 'mo'],
-            'Tuesday': ['tue', 'tuesday', 'tues', 'tu'],
-            'Wednesday': ['wed', 'wednesday', 'we'],
-            'Thursday': ['thu', 'thursday', 'thurs', 'th'],
-            'Friday': ['fri', 'friday', 'fr'],
-            'Saturday': ['sat', 'saturday', 'sa'],
-            'Sunday': ['sun', 'sunday', 'su']
-        }
-        
-        # First, check if course falls on any unavailable days
-        is_on_unavailable_day = False
-        if unavailable_days:
-            for unavailable_day in unavailable_days:
-                day_variants = day_mapping.get(unavailable_day, [])
-                if any(variant in time_lower for variant in day_variants):
-                    is_on_unavailable_day = True
-                    break
-        
-        # Skip this time slot if it's on an unavailable day
-        if is_on_unavailable_day:
+    if not filter_enabled: 
+        return True
+    unavailable_days = unavailable_days or []
+    for slot in course_times:
+        s = slot.lower()
+        # exclude unavailable days
+        if any(any(v in s for v in DAY_MAP.get(d, [])) for d in unavailable_days):
             continue
-        
-        # Then check general day preference (weekdays vs weekends)
-        # This now only applies to days that are NOT in the unavailable list
-        day_preference_match = True  # Default to match if no specific day preference
-        
+        # day pref
         if day_preference == 'weekdays':
-            # Check if it's Monday-Friday, but exclude any unavailable days
-            available_weekdays = []
-            for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']:
-                if day not in unavailable_days:
-                    available_weekdays.extend(day_mapping[day])
-            
-            day_preference_match = any(day_abbrev in time_lower for day_abbrev in available_weekdays)
-            
+            wk = any(any(v in s for v in DAY_MAP[d]) for d in ['Monday','Tuesday','Wednesday','Thursday','Friday'])
+            if not wk: 
+                continue
         elif day_preference == 'weekends':
-            # Check if it's Saturday-Sunday, but exclude any unavailable days  
-            available_weekends = []
-            for day in ['Saturday', 'Sunday']:
-                if day not in unavailable_days:
-                    available_weekends.extend(day_mapping[day])
-            
-            day_preference_match = any(day_abbrev in time_lower for day_abbrev in available_weekends)
-        
-        if not day_preference_match:
-            continue
-        
-        # Check time preference  
-        time_match = True  # Default to match if no specific time preference
+            we = any(any(v in s for v in DAY_MAP[d]) for d in ['Saturday','Sunday'])
+            if not we: 
+                continue
+        # time pref
         if time_preference == 'morning':
-            # Morning: 9 AM - 3 PM
-            morning_hours = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM"]
-            time_match = any(hour in time_slot for hour in morning_hours)
+            if not any(h in slot for h in ["9:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM"]):
+                continue
         elif time_preference == 'evening':
-            # Evening: 4 PM - 11 PM  
-            evening_hours = ["4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM"]
-            time_match = any(hour in time_slot for hour in evening_hours)
-        
-        if time_match:
-            return True
-    
+            if not any(h in slot for h in ["4:00 PM","5:00 PM","6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM","11:00 PM"]):
+                continue
+        return True
     return False
 
-def get_filter_reason(course_times, day_preference, time_preference, filter_enabled, unavailable_days=None):
-    """
-    Get the specific reason why a course was filtered out with simplified preferences
-    """
-    if not filter_enabled:
-        return "No filters applied"
-    
-    if unavailable_days is None:
-        unavailable_days = []
-    
-    reasons = []
-    
-    # Enhanced day mapping
-    day_mapping = {
-        'Monday': ['mon', 'monday', 'mo'],
-        'Tuesday': ['tue', 'tuesday', 'tues', 'tu'],
-        'Wednesday': ['wed', 'wednesday', 'we'],
-        'Thursday': ['thu', 'thursday', 'thurs', 'th'],
-        'Friday': ['fri', 'friday', 'fr'],
-        'Saturday': ['sat', 'saturday', 'sa'],
-        'Sunday': ['sun', 'sunday', 'su']
-    }
-    
-    for time_slot in course_times:
-        time_lower = time_slot.lower()
-        
-        # Check if course falls on unavailable days
-        for unavailable_day in unavailable_days:
-            day_variants = day_mapping.get(unavailable_day, [])
-            if any(variant in time_lower for variant in day_variants):
-                reasons.append(f"Scheduled on {unavailable_day} (you're not available)")
-                break
-        
-        # Check day preference conflicts
-        if day_preference == 'weekdays':
-            weekends = ['sat', 'sun']
-            if any(day in time_lower for day in weekends):
-                if any(d in ['Saturday', 'Sunday'] for d in unavailable_days):
-                    reasons.append(f"Scheduled on weekends (unavailable)")
-                else:
-                    reasons.append("Scheduled on weekends (you prefer weekdays)")
-        elif day_preference == 'weekends':
-            weekdays = ['mon', 'tue', 'wed', 'thu', 'fri']
-            if any(day in time_lower for day in weekdays):
-                weekday_conflicts = [d for d in unavailable_days if d in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']]
-                if weekday_conflicts:
-                    reasons.append(f"Scheduled on unavailable weekdays")
-                else:
-                    reasons.append("Scheduled on weekdays (you prefer weekends)")
-        
-        # Check time conflicts
-        if time_preference == 'morning':
-            evening_hours = ["4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM"]
-            if any(hour in time_slot for hour in evening_hours):
-                reasons.append("Scheduled in evening (you prefer morning)")
-        elif time_preference == 'evening':
-            morning_hours = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM"]
-            if any(hour in time_slot for hour in morning_hours):
-                reasons.append("Scheduled in morning (you prefer evening)")
-    
-    return " • ".join(list(set(reasons))) if reasons else "Doesn't match your preferences"
-
-def filter_schedule_with_tracking(original_schedule, day_preference, time_preference, filter_enabled, unavailable_days=None):
-    """
-    Filter schedule and track what gets filtered out with simplified preferences
-    """
-    if unavailable_days is None:
-        unavailable_days = []
-        
-    filtered_schedule = []
-    filtered_out = []
-    
-    for item in original_schedule:
-        course_info = COURSE_CATALOG.get(item['course'], {})
-        course_times = course_info.get('available_times', [])
-        
-        if matches_availability(course_times, day_preference, time_preference, filter_enabled, unavailable_days):
-            filtered_schedule.append(item)
+def filter_schedule_with_tracking(original, day_pref, time_pref, enabled, unavailable_days=None):
+    unavailable_days = unavailable_days or []
+    keep, hidden = [], []
+    for item in original:
+        info = COURSE_CATALOG.get(item['course'], {})
+        times = info.get('available_times', [])
+        if matches_availability(times, day_pref, time_pref, enabled, unavailable_days):
+            keep.append(item)
         else:
-            # Track what was filtered out and why
-            reason = get_filter_reason(course_times, day_preference, time_preference, filter_enabled, unavailable_days)
-            filtered_out.append({
-                'item': item,
-                'reason': reason,
-                'times': course_times[:3] if len(course_times) > 3 else course_times  # Show first 3 times
-            })
-    
-    return filtered_schedule, filtered_out
+            hidden.append({"item": item, "reason": "Doesn't match your day/time preferences", "times": times[:3]})
+    return keep, hidden
 
-def generate_suggested_sequence(schedule, availability):
-    """
-    Generate an optimal sequence of classes based on user availability and class dates
-    """
+def generate_suggested_sequence(schedule, availability, days_until_test):
     if not availability.get('filter_enabled', False):
         return None
+    day = availability.get('day_preference','both')
+    time = availability.get('time_preference','both')
+    blocked = availability.get('unavailable_days',[])
     
-    # Get user preferences
-    day_preference = availability.get('day_preference', 'both')
-    time_preference = availability.get('time_preference', 'both')
-    unavailable_days = availability.get('unavailable_days', [])
-    
-    # Find matching classes with their best times
-    sequence = []
-    
-    for item in schedule:
-        course_info = COURSE_CATALOG.get(item['course'], {})
-        available_times = course_info.get('available_times', [])
-        
-        if not available_times:
-            continue
-            
-        # Find times that match user preferences
-        matching_times = []
-        for time_slot in available_times:
-            if matches_availability([time_slot], day_preference, time_preference, True, unavailable_days):
-                matching_times.append(time_slot)
-        
-        if matching_times:
-            # Parse dates to suggest optimal timing
-            suggested_timing = get_suggested_timing(item['course'], matching_times)
-            
-            sequence.append({
-                'course': item['course'],
-                'weeks': item['weeks'],
-                'focus': item['focus'],
-                'icon': item['icon'],
-                'suggested_times': matching_times[:2],  # Top 2 matches
-                'suggested_timing': suggested_timing
+    # Get all available courses that match schedule
+    available_courses = []
+    for course_name, info in COURSE_CATALOG.items():
+        times = info.get('available_times', [])
+        matches = [t for t in times if matches_availability([t], day, time, True, blocked)]
+        if matches:
+            available_courses.append({
+                'course': course_name,
+                'available_times': matches,
+                'type': classify_course_type(course_name),
+                'duration_weeks': get_course_duration(course_name)
             })
     
-    # Sort sequence for optimal learning progression
-    return sort_optimal_sequence(sequence)
+    # Build comprehensive sequence based on timeline
+    sequence = build_comprehensive_sequence(available_courses, days_until_test)
+    return sequence
 
-def get_suggested_timing(course_name, matching_times):
-    """
-    Extract and format timing information from matching times
-    """
-    if not matching_times:
-        return "Contact for schedule"
+def classify_course_type(course_name):
+    """Classify course into type categories"""
+    if 'Bootcamp' in course_name:
+        return 'intensive'
+    elif 'Prep Course' in course_name:
+        return 'comprehensive'
+    elif 'Cram Session' in course_name:
+        return 'focused'
+    elif 'Practice' in course_name:
+        return 'practice'
+    elif 'Review' in course_name:
+        return 'review'
+    elif 'Math Course' in course_name or 'ELA Course' in course_name:
+        return 'subject_focused'
+    return 'general'
+
+def get_course_duration(course_name):
+    """Estimate course duration in weeks"""
+    if '2-Week' in course_name or 'Bootcamp' in course_name:
+        return 2
+    elif '4-Week' in course_name:
+        return 4
+    elif 'Prep Course' in course_name and '4-Week' not in course_name:
+        return 8
+    elif 'Cram Session' in course_name or 'Review' in course_name:
+        return 1
+    elif 'Practice' in course_name:
+        return 0.5  # Half week for practice sessions
+    return 1
+
+def build_comprehensive_sequence(available_courses, days_until_test):
+    """Build a comprehensive, varied sequence with weekly practice"""
+    weeks_available = max(days_until_test // 7, 1)
+    sequence = []
+    used_weeks = 0
+    
+    # Sort courses by type priority and availability
+    course_types = {
+        'comprehensive': [c for c in available_courses if c['type'] == 'comprehensive'],
+        'intensive': [c for c in available_courses if c['type'] == 'intensive'],
+        'subject_focused': [c for c in available_courses if c['type'] == 'subject_focused'],
+        'focused': [c for c in available_courses if c['type'] == 'focused'],
+        'review': [c for c in available_courses if c['type'] == 'review'],
+        'practice': [c for c in available_courses if c['type'] == 'practice']
+    }
+    
+    # Phase 1: Foundation Building (40% of time)
+    foundation_weeks = max(int(weeks_available * 0.4), 1)
+    if course_types['comprehensive'] and used_weeks < foundation_weeks:
+        course = course_types['comprehensive'][0]
+        sequence.append({
+            'phase': 'Foundation',
+            'week_range': f"Week {used_weeks + 1}-{min(used_weeks + int(course['duration_weeks']), foundation_weeks)}",
+            'course': course['course'],
+            'focus': 'Comprehensive SAT preparation and strategy building',
+            'icon': '📚',
+            'available_times': course['available_times'][:3],
+            'type': 'Primary Course'
+        })
+        used_weeks += int(course['duration_weeks'])
+    elif course_types['intensive'] and used_weeks < foundation_weeks:
+        course = course_types['intensive'][0]
+        sequence.append({
+            'phase': 'Foundation',
+            'week_range': f"Week {used_weeks + 1}-{used_weeks + int(course['duration_weeks'])}",
+            'course': course['course'],
+            'focus': 'Intensive skill building and concept mastery',
+            'icon': '🚀',
+            'available_times': course['available_times'][:3],
+            'type': 'Primary Course'
+        })
+        used_weeks += int(course['duration_weeks'])
+    
+    # Add weekly practice during foundation
+    if course_types['practice'] and weeks_available > 4:
+        practice_course = course_types['practice'][0]
+        sequence.append({
+            'phase': 'Foundation',
+            'week_range': f"Week {max(used_weeks-1, 1)} onwards",
+            'course': practice_course['course'],
+            'focus': 'Weekly practice tests to track progress',
+            'icon': '📝',
+            'available_times': practice_course['available_times'][:3],
+            'type': 'Weekly Practice'
+        })
+    
+    # Phase 2: Subject Mastery (30% of time)
+    mastery_weeks = max(int(weeks_available * 0.3), 1)
+    mastery_start = used_weeks + 1
+    
+    # Add Math focus
+    if course_types['subject_focused']:
+        math_courses = [c for c in course_types['subject_focused'] if 'Math' in c['course']]
+        if math_courses and used_weeks < mastery_start + mastery_weeks:
+            course = math_courses[0]
+            sequence.append({
+                'phase': 'Subject Mastery',
+                'week_range': f"Week {used_weeks + 1}-{used_weeks + int(course['duration_weeks'])}",
+                'course': course['course'],
+                'focus': 'Advanced math strategies and problem-solving',
+                'icon': '🔢',
+                'available_times': course['available_times'][:3],
+                'type': 'Subject Focus'
+            })
+            used_weeks += int(course['duration_weeks'])
+    
+    # Add ELA focus
+    if course_types['subject_focused']:
+        ela_courses = [c for c in course_types['subject_focused'] if 'ELA' in c['course']]
+        if ela_courses and used_weeks < mastery_start + mastery_weeks:
+            course = ela_courses[0]
+            sequence.append({
+                'phase': 'Subject Mastery',
+                'week_range': f"Week {used_weeks + 1}-{used_weeks + int(course['duration_weeks'])}",
+                'course': course['course'],
+                'focus': 'Reading comprehension and writing excellence',
+                'icon': '📖',
+                'available_times': course['available_times'][:3],
+                'type': 'Subject Focus'
+            })
+            used_weeks += int(course['duration_weeks'])
+    
+    # Phase 3: Targeted Improvement (20% of time)
+    if course_types['focused'] and weeks_available > 6:
+        improvement_weeks = max(int(weeks_available * 0.2), 1)
         
-    # Parse the first matching time for date range
-    first_time = matching_times[0]
-    
-    # Extract date patterns from time strings
-    if "Sep" in first_time and "Oct" in first_time:
-        return "September 4 - October 30 (8 weeks)"
-    elif "Sep" in first_time:
-        if "2-Week" in course_name or "Math" in course_name:
-            return "September 4-11 (2 weeks)"
-        else:
-            return "September start"
-    elif "Oct" in first_time:
-        if "2-Week" in course_name:
-            return "October 26 - November 2 (2 weeks)"
-        else:
-            return "October start"
-    elif "Nov" in first_time:
-        if "2-Week" in course_name:
-            return "November 23-30 (2 weeks)"
-        else:
-            return "November start"
-    else:
-        return "See available times"
-
-def sort_optimal_sequence(sequence):
-    """
-    Sort courses in optimal learning order (foundation -> specific -> final review)
-    """
-    if not sequence:
-        return []
-    
-    # Define course priority order for optimal learning
-    priority_order = [
-        "SAT Prep Course",           # Foundation first
-        "SAT 4-Week Prep Course",    # Alternative foundation
-        "SAT 8-Week Prep Class",     # Extended foundation
-        "2-Week SAT Math Course",    # Subject-specific
-        "SAT Math 1-Week Bootcamp",  # Math intensive
-        "2-Week SAT ELA Course",     # ELA specific  
-        "SAT Reading & Writing 1-Week Bootcamp",  # ELA intensive
-        "SAT 2-Week Bootcamp",       # General intensive
-        "Ultimate SAT Review Session", # Final review
-        "Proctored Practice SAT"      # Practice tests throughout
-    ]
-    
-    sorted_sequence = []
-    
-    # Add courses in priority order
-    for course_name in priority_order:
-        for item in sequence:
-            if item['course'] == course_name:
-                sorted_sequence.append(item)
-                break
-    
-    # Add any remaining courses not in priority list
-    for item in sequence:
-        if item not in sorted_sequence:
-            sorted_sequence.append(item)
-    
-    return sorted_sequence[:4]  # Limit to top 4 recommendations
-
-# Branded Stepper Component
-progress_labels = ["Quick set up", "Your SAT prep journey"]
-
-def render_stepper(current_step):
-    # Use completely native Streamlit components
-    st.markdown("---")
-    
-    # Create step indicators using columns  
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        # Step progress display
-        step_text = ""
-        for i, label in enumerate(progress_labels, 1):
-            if i < current_step:
-                step_text += f"✅ **{label}**"
-            elif i == current_step:
-                step_text += f"🔵 **{label}** _(current)_"
-            else:
-                step_text += f"⚪ {label}"
-            
-            if i < len(progress_labels):
-                step_text += " → "
+        # Math cram session
+        math_cram = [c for c in course_types['focused'] if 'Math' in c['course']]
+        if math_cram:
+            course = math_cram[0]
+            sequence.append({
+                'phase': 'Targeted Improvement',
+                'week_range': f"Week {used_weeks + 1}",
+                'course': course['course'],
+                'focus': 'Intensive math review and advanced techniques',
+                'icon': '🎯',
+                'available_times': course['available_times'][:3],
+                'type': 'Intensive Session'
+            })
+            used_weeks += 1
         
-        st.markdown(step_text)
+        # Reading/Writing cram session
+        ela_cram = [c for c in course_types['focused'] if 'Reading' in c['course'] or 'Writing' in c['course']]
+        if ela_cram:
+            course = ela_cram[0]
+            sequence.append({
+                'phase': 'Targeted Improvement',
+                'week_range': f"Week {used_weeks + 1}",
+                'course': course['course'],
+                'focus': 'Reading strategies and writing optimization',
+                'icon': '✍️',
+                'available_times': course['available_times'][:3],
+                'type': 'Intensive Session'
+            })
+            used_weeks += 1
     
-    st.markdown("---")
+    # Phase 4: Final Preparation (10% of time)
+    if course_types['review']:
+        review_course = course_types['review'][0]
+        sequence.append({
+            'phase': 'Final Preparation',
+            'week_range': f"Week {min(used_weeks + 1, weeks_available)}",
+            'course': review_course['course'],
+            'focus': 'Last-minute review and test-day strategies',
+            'icon': '🏁',
+            'available_times': review_course['available_times'][:3],
+            'type': 'Final Review'
+        })
+    
+    # Add final practice sessions
+    if course_types['practice'] and weeks_available > 2:
+        practice_course = course_types['practice'][0]
+        sequence.append({
+            'phase': 'Final Preparation',
+            'week_range': f"Final 2 weeks",
+            'course': practice_course['course'],
+            'focus': 'Full-length practice tests under timed conditions',
+            'icon': '⏰',
+            'available_times': practice_course['available_times'][:3],
+            'type': 'Final Practice'
+        })
+    
+    return sequence
 
-# Render the stepper
-render_stepper(st.session_state.step)
+# ==========================
+# Top: Hero + Stepper
+# ==========================
+st.markdown('<div class="hero"><h1>🎯 SAT Class Finder</h1><p>See the right classes for your timeline and schedule. All times shown in ET.</p></div>', unsafe_allow_html=True)
 
-# Step 1: Quick Setup (Test Date + Simplified Availability)
+c1, c2 = st.columns(2)
+with c1:
+    go_step1 = st.button("① Quick setup", type="primary" if st.session_state.step==1 else "secondary")
+with c2:
+    go_step2 = st.button("② Your plan", type="primary" if st.session_state.step==2 else "secondary")
+if go_step1: st.session_state.step = 1
+if go_step2: st.session_state.step = 2
+
+# ==========================
+# STEP 1 — Quick setup
+# ==========================
 if st.session_state.step == 1:
-    # Visual hero section
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("# 🎯 SAT Class Finder")
-        st.success("**Find your perfect prep plan in 2 minutes!**")
-    
-    # Visual progress indicator
-    st.progress(0.5, "Step 1 of 2: Quick Setup")
-    
-    # Test Date Selection Card with visuals
+    st.progress(0.5, text="Step 1 of 2: Quick setup")
+
     st.markdown("### 📅 When are you taking the SAT?")
-    st.caption("Pick your test date to see your perfect timeline")
-    
-    # Filter out past dates
-    available_dates = {date_str: date_obj for date_str, date_obj in SAT_DATES.items() 
-                      if (date_obj - date.today()).days > 0}
-    
+    st.caption("Pick your test date to tailor your prep timeline.")
+
+    available_dates = {k:v for k,v in SAT_DATES.items() if (v - date.today()).days > 0}
     if not available_dates:
-        st.error("⚠️ No upcoming SAT dates available. Please check back later.")
+        st.error("No upcoming SAT dates available.")
     else:
-        # Date selection in a container
-        col1, col2 = st.columns([3, 2])
-        with col1:
-            selected_date = st.selectbox(
-                "Select your test date:",
-                options=list(available_dates.keys()),
-                index=0 if not st.session_state.test_date else list(available_dates.keys()).index(st.session_state.test_date) if st.session_state.test_date in available_dates else 0,
-                help="Choose when you plan to take the SAT",
-                label_visibility="collapsed"
-            )
-            st.session_state.test_date = selected_date
-            
-        with col2:
-            # Show timeline info as a neutral indicator
-            days_until = (available_dates[selected_date] - date.today()).days
+        left, right = st.columns([3,2])
+        with left:
+            options = list(available_dates.keys())
+            default_idx = options.index(st.session_state.test_date) if st.session_state.test_date in available_dates else 0
+            selected = st.selectbox("Select your test date", options=options, index=default_idx, label_visibility="collapsed")
+            st.session_state.test_date = selected
+        with right:
+            days_until = (available_dates[selected] - date.today()).days
             if days_until > 56:
-                timeline_text = "Perfect prep window"
+                st.success(f"**Your test is in {days_until} days** — 🌟 Perfect prep window")
             elif days_until > 28:
-                timeline_text = "Focused prep needed"
+                st.warning(f"**Your test is in {days_until} days** — ⚡ Focused prep needed")
             else:
-                timeline_text = "Intensive prep required"
-            
-            # Show timeline status with neutral styling
-            st.info(f"**Your test is in {days_until} days** — {timeline_text}")
-    
-    # Visual schedule preferences section
-    st.markdown("### ⚙️ Schedule preferences")
-    st.caption("Optional: Filter classes to match your availability")
-    
-    # Visual filter toggle
-    filter_enabled = st.checkbox(
-        "🎯 Only show classes that fit my schedule", 
-        value=st.session_state.availability['filter_enabled']
-    )
-    st.session_state.availability['filter_enabled'] = filter_enabled
-    
-    if filter_enabled:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("**📅 When can you attend?**")
+                st.error(f"**Your test is in {days_until} days** — 🚨 Intensive prep required")
+
+    st.markdown("### ⚙️ Schedule preferences (optional)")
+    st.caption("Filter classes to match when you can attend.")
+
+    # Toggle with fallback for older Streamlit
+    if hasattr(st, "toggle"):
+        toggle = st.toggle("Only show classes that fit my schedule", value=st.session_state.availability['filter_enabled'])
+    else:
+        toggle = st.checkbox("Only show classes that fit my schedule", value=st.session_state.availability['filter_enabled'])
+    st.session_state.availability['filter_enabled'] = toggle
+
+    if toggle:
+        colA, colB = st.columns(2)
+        with colA:
             day_pref = st.radio(
                 "Day preference",
-                options=['both', 'weekdays', 'weekends'],
-                index=['both', 'weekdays', 'weekends'].index(st.session_state.availability['day_preference']),
-                format_func=lambda x: {
-                    'both': '🗓️ Any day',
-                    'weekdays': '💼 Weekdays only',
-                    'weekends': '🏖️ Weekends only'
-                }[x],
-                label_visibility="collapsed"
+                options=['both','weekdays','weekends'],
+                index=['both','weekdays','weekends'].index(st.session_state.availability['day_preference']),
+                format_func=lambda x:{'both':'🗓️ Any day','weekdays':'💼 Weekdays only','weekends':'🏖️ Weekends only'}[x],
+                label_visibility="collapsed",
+                help="Choose which days generally work best.",
             )
             st.session_state.availability['day_preference'] = day_pref
-        
-        with col2:
-            st.markdown("**⏰ What time works best?**")
+        with colB:
             time_pref = st.radio(
                 "Time preference",
-                options=['both', 'morning', 'evening'],
-                index=['both', 'morning', 'evening'].index(st.session_state.availability['time_preference']),
-                format_func=lambda x: {
-                    'both': '🕐 Any time',
-                    'morning': '🌅 Morning/afternoon',
-                    'evening': '🌆 Evening/night'
-                }[x],
-                label_visibility="collapsed"
+                options=['both','morning','evening'],
+                index=['both','morning','evening'].index(st.session_state.availability['time_preference']),
+                format_func=lambda x:{'both':'🕐 Any time','morning':'🌅 Morning/afternoon (9a–3p ET)','evening':'🌆 Evening/night (4p–11p ET)'}[x],
+                label_visibility="collapsed",
             )
             st.session_state.availability['time_preference'] = time_pref
-            
-        # Add specific weekday unavailability section
-        st.markdown("---")
+
         st.markdown("**📅 Days you're NOT available**")
-        st.caption("Select any weekdays when you cannot attend classes")
-        
-        # Initialize unavailable_days if not exists
-        if 'unavailable_days' not in st.session_state.availability:
-            st.session_state.availability['unavailable_days'] = []
-        
-        # Create visual weekday selection
-        days_of_week = {
-            'Monday': '📅 Monday',
-            'Tuesday': '📅 Tuesday', 
-            'Wednesday': '📅 Wednesday',
-            'Thursday': '📅 Thursday',
-            'Friday': '📅 Friday',
-            'Saturday': '📅 Saturday',
-            'Sunday': '📅 Sunday'
-        }
-        
-        # Create columns for days (3 columns with 2-3 days each)
-        col1, col2, col3 = st.columns(3)
-        unavailable_days = st.session_state.availability['unavailable_days'].copy()
-        
-        with col1:
-            for day in ['Monday', 'Tuesday']:
-                if st.checkbox(days_of_week[day], key=f"unavailable_{day}", value=day in unavailable_days):
-                    if day not in unavailable_days:
-                        unavailable_days.append(day)
-                else:
-                    if day in unavailable_days:
-                        unavailable_days.remove(day)
-        
-        with col2:
-            for day in ['Wednesday', 'Thursday', 'Friday']:
-                if st.checkbox(days_of_week[day], key=f"unavailable_{day}", value=day in unavailable_days):
-                    if day not in unavailable_days:
-                        unavailable_days.append(day)
-                else:
-                    if day in unavailable_days:
-                        unavailable_days.remove(day)
-        
-        with col3:
-            for day in ['Saturday', 'Sunday']:
-                if st.checkbox(days_of_week[day], key=f"unavailable_{day}", value=day in unavailable_days):
-                    if day not in unavailable_days:
-                        unavailable_days.append(day)
-                else:
-                    if day in unavailable_days:
-                        unavailable_days.remove(day)
-        
-        # Update session state
-        st.session_state.availability['unavailable_days'] = unavailable_days
-        
-        # Show unavailable days summary
-        if unavailable_days:
-            unavailable_display = [f"❌ {day}" for day in sorted(unavailable_days)]
-            st.warning("**Not available:** " + " • ".join(unavailable_display))
-        else:
-            st.info("✅ Available all days")
-            
-        # Visual preference summary
-        prefs = []
-        available_days_summary = []
-        
-        # Day preference summary
+        unavailable = st.multiselect(
+            "Days you can't attend",
+            options=list(DAY_MAP.keys()),
+            default=st.session_state.availability.get('unavailable_days',[]),
+            label_visibility="collapsed",
+        )
+        st.session_state.availability['unavailable_days'] = unavailable
+
+        # Summary
+        summary = []
         if day_pref == 'weekdays':
-            available_weekdays = [day for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] 
-                                if day not in unavailable_days]
-            if available_weekdays:
-                available_days_summary.append(f"💼 Available weekdays: {', '.join(available_weekdays)}")
-            else:
-                available_days_summary.append("⚠️ No weekdays available")
+            days_ok = [d for d in ['Monday','Tuesday','Wednesday','Thursday','Friday'] if d not in unavailable]
+            summary.append("💼 Available weekdays: " + (", ".join(days_ok) if days_ok else "None"))
         elif day_pref == 'weekends':
-            available_weekends = [day for day in ['Saturday', 'Sunday'] 
-                                if day not in unavailable_days]
-            if available_weekends:
-                available_days_summary.append(f"🏖️ Available weekends: {', '.join(available_weekends)}")
-            else:
-                available_days_summary.append("⚠️ No weekends available")
+            days_ok = [d for d in ['Saturday','Sunday'] if d not in unavailable]
+            summary.append("🏖️ Available weekends: " + (", ".join(days_ok) if days_ok else "None"))
         else:
-            # "Any day" preference
-            all_available_days = [day for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] 
-                                if day not in unavailable_days]
-            if all_available_days:
-                available_days_summary.append(f"📅 Available days: {', '.join(all_available_days)}")
-        
-        # Time preference
-        if time_pref == 'morning':
-            prefs.append("🌅 Morning/afternoon classes")
-        elif time_pref == 'evening':
-            prefs.append("🌆 Evening/night classes")
-        else:
-            prefs.append("🕐 Any time works")
-        
-        # Combine and display
-        if available_days_summary:
-            st.success("**" + " • ".join(available_days_summary + prefs) + "**")
-    else:
-        st.info("📚 Will show all available classes")
-    
-    # Visual CTA section
+            days_ok = [d for d in DAY_MAP.keys() if d not in unavailable]
+            summary.append("📅 Available days: " + (", ".join(days_ok) if days_ok else "None"))
+        summary.append({'both':'🕐 Any time works','morning':'🌅 Morning/afternoon','evening':'🌆 Evening/night'}[time_pref])
+        st.success("**" + " • ".join(summary) + "**")
+
     st.markdown("---")
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("### 🚀 Ready to see your plan?")
-        if st.button("Get My Personalized SAT Journey →", key="continue_to_journey", use_container_width=True, type="primary"):
+    center = st.columns([1,2,1])[1]
+    with center:
+        if st.button("Get my personalized SAT journey →", use_container_width=True, type="primary"):
             if st.session_state.test_date:
                 st.session_state.step = 2
                 st.rerun()
             else:
-                st.error("📅 Please select a test date first")
+                st.error("Please select a test date first.")
 
-# Step 2: Your SAT Prep Journey  
-elif st.session_state.step == 2:
-    # Journey content starts here
-    target_date_obj = SAT_DATES[st.session_state.test_date]
-    days_until = (target_date_obj - date.today()).days
-    
-    # Visual hero section for journey
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("# 🎯 Your SAT Success Journey")
-        st.success(f"**Test date: {st.session_state.test_date}** • {days_until} days to go!")
-    
-    # Visual progress indicator
-    st.progress(1.0, "Step 2 of 2: Your Personalized Plan")
-    
-    # Determine timeline category and create schedule
+# ==========================
+# STEP 2 — Your plan
+# ==========================
+else:
+    st.progress(1.0, text="Step 2 of 2: Your personalized plan")
+
+    if not st.session_state.test_date:
+        st.warning("Pick a test date on Step 1 to generate your plan.")
+        st.stop()
+
+    target = SAT_DATES[st.session_state.test_date]
+    days_until = (target - date.today()).days
+
+    st.markdown("## 🚀 Your SAT success journey")
+    st.caption(f"Test date: {st.session_state.test_date} • {days_until} days to go")
+
+    # Build schedule by timeline
     if days_until > 56:
-        timeline_status = "excellent"
-        timeline_color = "#22c55e"
-        timeline_text = "🌟 Perfect Timeline"
-        weeks_available = days_until // 7
-        recommended_classes = list(COURSE_CATALOG.keys())
-        
-        # Create weekly schedule for excellent timeline
         schedule = [
-            {"weeks": "Week 1-8", "course": "SAT Prep Course", "focus": "Foundation Building", "icon": "📚"},
-            {"weeks": "Week 9-10", "course": "2-Week SAT Math Course", "focus": "Math Mastery", "icon": "🔢"},
-            {"weeks": "Week 11-12", "course": "2-Week SAT ELA Course", "focus": "Reading & Writing", "icon": "📖"},
-            {"weeks": "Week 13", "course": "Ultimate SAT Review Session", "focus": "Final Review", "icon": "🎯"},
-            {"weeks": "Ongoing", "course": "Proctored Practice SAT", "focus": "Test Practice", "icon": "📝"}
+            {"weeks":"Week 1-8","course":"SAT Prep Course","focus":"Foundation Building","icon":"📚"},
+            {"weeks":"Week 9-10","course":"2-Week SAT Math Course","focus":"Math Mastery","icon":"🔢"},
+            {"weeks":"Week 11-12","course":"2-Week SAT ELA Course","focus":"Reading & Writing","icon":"📖"},
+            {"weeks":"Week 13","course":"Ultimate SAT Review Session","focus":"Final Review","icon":"🎯"},
+            {"weeks":"Ongoing","course":"Proctored Practice SAT","focus":"Test Practice","icon":"📝"},
         ]
-        
-        # Filter schedule based on availability  
-        filtered_out_classes = []
-        if st.session_state.availability['filter_enabled']:
-            filtered_schedule, filtered_out_classes = filter_schedule_with_tracking(
-                schedule, 
-                st.session_state.availability['day_preference'], 
-                st.session_state.availability['time_preference'],
-                st.session_state.availability['filter_enabled'],
-                st.session_state.availability.get('unavailable_days', [])
-            )
-            schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
-        
+        st.success(f"🌟 Perfect timeline • {max(days_until//7,1)} weeks to prepare")
     elif days_until > 28:
-        timeline_status = "good"
-        timeline_color = "#f59e0b"
-        timeline_text = "⚡ Intensive Timeline"
-        weeks_available = days_until // 7
-        recommended_classes = [
-            "SAT 4-Week Prep Course", "SAT 2-Week Bootcamp", "2-Week SAT Math Course", 
-            "2-Week SAT ELA Course", "SAT Math Cram Session", "SAT Reading/Writing Cram Session",
-            "Ultimate SAT Review Session", "Proctored Practice SAT"
-        ]
-        
-        # Create weekly schedule for good timeline
         schedule = [
-            {"weeks": "Week 1-4", "course": "SAT 4-Week Prep Course", "focus": "Core Concepts", "icon": "📚"},
-            {"weeks": "Week 5-6", "course": "2-Week SAT Math Course", "focus": "Math Focus", "icon": "🔢"},
-            {"weeks": "Week 7", "course": "SAT Reading/Writing Cram Session", "focus": "ELA Boost", "icon": "📖"},
-            {"weeks": "Week 8", "course": "Ultimate SAT Review Session", "focus": "Final Prep", "icon": "🎯"},
-            {"weeks": "Weekly", "course": "Proctored Practice SAT", "focus": "Practice Tests", "icon": "📝"}
+            {"weeks":"Week 1-4","course":"SAT 4-Week Prep Course","focus":"Core Concepts","icon":"📚"},
+            {"weeks":"Week 5-6","course":"2-Week SAT Math Course","focus":"Math Focus","icon":"🔢"},
+            {"weeks":"Week 7","course":"SAT Reading/Writing Cram Session","focus":"ELA Boost","icon":"📖"},
+            {"weeks":"Week 8","course":"Ultimate SAT Review Session","focus":"Final Prep","icon":"🎯"},
+            {"weeks":"Weekly","course":"Proctored Practice SAT","focus":"Practice Tests","icon":"📝"},
         ]
-        
-        # Filter schedule based on availability
-        if not 'filtered_out_classes' in locals():
-            filtered_out_classes = []
-        if st.session_state.availability['filter_enabled']:
-            filtered_schedule, additional_filtered_out = filter_schedule_with_tracking(
-                schedule, 
-                st.session_state.availability['day_preference'], 
-                st.session_state.availability['time_preference'],
-                st.session_state.availability['filter_enabled'],
-                st.session_state.availability.get('unavailable_days', [])
-            )
-            schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
-            filtered_out_classes.extend(additional_filtered_out)
-        
+        st.warning(f"⚡ Intensive timeline • {max(days_until//7,1)} weeks to prepare")
     else:
-        timeline_status = "urgent"
-        timeline_color = "#ef4444"
-        timeline_text = "🚨 Rush Timeline"
-        weeks_available = max(days_until // 7, 2)
-        recommended_classes = [
-            "SAT 2-Week Bootcamp", "1-Week SAT Math Bootcamp", "1-Week SAT ELA Bootcamp",
-            "SAT Math Cram Session", "SAT Reading/Writing Cram Session", "Ultimate SAT Review Session",
-            "Proctored Practice SAT"
-        ]
-        
-        # Create weekly schedule for urgent timeline
         schedule = [
-            {"weeks": "Week 1-2", "course": "SAT 2-Week Bootcamp", "focus": "Essential Skills", "icon": "🚀"},
-            {"weeks": "Week 3", "course": "1-Week SAT Math Bootcamp", "focus": "Math Intensive", "icon": "🔢"},
-            {"weeks": "Week 4", "course": "SAT Reading/Writing Cram Session", "focus": "ELA Cram", "icon": "📖"},
-            {"weeks": "Final Days", "course": "Ultimate SAT Review Session", "focus": "Last Review", "icon": "🎯"},
-            {"weeks": "Ongoing", "course": "Proctored Practice SAT", "focus": "Practice", "icon": "📝"}
+            {"weeks":"Week 1-2","course":"SAT 2-Week Bootcamp","focus":"Essential Skills","icon":"🚀"},
+            {"weeks":"Week 3","course":"SAT Math Cram Session","focus":"Math Intensive","icon":"🔢"},
+            {"weeks":"Week 4","course":"SAT Reading/Writing Cram Session","focus":"ELA Cram","icon":"📖"},
+            {"weeks":"Final Days","course":"Ultimate SAT Review Session","focus":"Last Review","icon":"🎯"},
+            {"weeks":"Ongoing","course":"Proctored Practice SAT","focus":"Practice","icon":"📝"},
         ]
+        st.error(f"🚨 Rush timeline • {max(days_until//7,1)} weeks to prepare")
+
+    # Apply filters if enabled
+    filtered_out = []
+    av = st.session_state.availability
+    if av['filter_enabled']:
+        kept, hidden = filter_schedule_with_tracking(
+            schedule,
+            av['day_preference'],
+            av['time_preference'],
+            True,
+            av.get('unavailable_days',[])
+        )
+        schedule = kept or schedule
+        filtered_out = hidden
+        labels = []
+        if av['day_preference']!='both':
+            labels.append('Weekdays' if av['day_preference']=='weekdays' else 'Weekends')
+        if av['time_preference']!='both':
+            labels.append('Morning/Afternoon' if av['time_preference']=='morning' else 'Evening/Night')
+        if labels:
+            st.info("📅 **Filtered for:** " + " • ".join(labels))
+
+    # Comprehensive suggested sequence (if filters on)
+    suggested = generate_suggested_sequence(schedule, av, days_until)
+    if suggested:
+        st.markdown("### 🗺️ Your personalized SAT prep schedule")
+        weeks_available = max(days_until // 7, 1)
+        st.caption(f"Optimized {weeks_available}-week preparation plan with weekly practice and varied course types")
         
-        # Filter schedule based on availability
-        if not 'filtered_out_classes' in locals():
-            filtered_out_classes = []
-        if st.session_state.availability['filter_enabled']:
-            filtered_schedule, additional_filtered_out = filter_schedule_with_tracking(
-                schedule, 
-                st.session_state.availability['day_preference'], 
-                st.session_state.availability['time_preference'],
-                st.session_state.availability['filter_enabled'],
-                st.session_state.availability.get('unavailable_days', [])
-            )
-            schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
-            filtered_out_classes.extend(additional_filtered_out)
-    
-    # Show availability filtering info
-    if st.session_state.availability['filter_enabled']:
-        day_pref = st.session_state.availability['day_preference']
-        time_pref = st.session_state.availability['time_preference']
+        # Create timeline overview
+        st.markdown("#### 📅 Your Prep Timeline")
         
-        filter_parts = []
-        if day_pref != 'both':
-            filter_parts.append(f"{'Weekdays' if day_pref == 'weekdays' else 'Weekends'}")
-        if time_pref != 'both':
-            filter_parts.append(f"{'Morning/Afternoon' if time_pref == 'morning' else 'Evening/Night'}")
+        # Timeline visualization
+        timeline_data = []
+        practice_weeks = []
         
-        if filter_parts:
-            availability_text = f"Filtered for: {' • '.join(filter_parts)}"
-            st.info(f"📅 **{availability_text}** - Only showing classes that match your preferences!")
+        for item in suggested:
+            week_range = item.get('week_range', '')
+            course_type = item.get('type', 'Course')
             
-            original_schedule_count = 5  # Approximate original schedule size
-            if len(schedule) < original_schedule_count:
-                st.warning(f"⚠️ Some classes were filtered out due to schedule conflicts. Showing {len(schedule)} of {original_schedule_count} recommended classes.")
-    
-    # Display SAT prep journey timeline using native components
-    st.markdown("## 🚀 Your SAT Success Journey")
-    st.markdown("Follow this personalized timeline to maximize your SAT score")
-    
-    # Timeline status indicator
-    if timeline_status == "excellent":
-        st.success(f"🌟 **{timeline_text}** • {weeks_available} weeks to prepare")
-    elif timeline_status == "good": 
-        st.warning(f"⚡ **{timeline_text}** • {weeks_available} weeks to prepare")
-    else:
-        st.error(f"🚨 **{timeline_text}** • {weeks_available} weeks to prepare")
-    
-    # Add suggested class sequence section with stunning learning pathways design
-    if generate_suggested_sequence(schedule, st.session_state.availability):
-        suggested_sequence = generate_suggested_sequence(schedule, st.session_state.availability)
-        
-        # Hero section for personalized journey
-        st.markdown("---")
-        st.markdown("# Your personalized SAT success journey")
-        st.markdown("### Follow the proven pathway to SAT mastery")
-        st.markdown("---")
-        
-        # Visual journey introduction
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.success("🎯 **Perfect plan for your timeline!**")
-        
-        # Visual roadmap with progress indicators
-        st.markdown("### 🗺️ Your learning journey")
-        
-        # Visual progress overview with emojis and minimal text
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.markdown("### 🏗️")
-            st.success("**Step 1**")
-            st.caption("Build foundation")
-        with col2:
-            st.markdown("### 🔢") 
-            st.info("**Step 2**")
-            st.caption("Master math")
-        with col3:
-            st.markdown("### 📚")
-            st.warning("**Step 3**")
-            st.caption("Perfect language")
-        with col4:
-            st.markdown("### 🏆")
-            st.success("**Success**")
-            st.caption("Ace your test")
-        
-        st.markdown("---")
-        st.markdown("## Start here")
-        st.markdown("---")
-        
-        # Create stunning diamond-style pathway cards (like the image)
-        colors = ["#FF9500", "#3498DB", "#2ECC71", "#17A2B8", "#DC3545"]  # Orange, Blue, Green, Teal, Red
-        
-        for i, item in enumerate(suggested_sequence, 1):
-            course_info = COURSE_CATALOG.get(item['course'], {})
-            times = item.get('suggested_times', course_info.get('available_times', [])[:2])
-            
-            # Select color for this step
-            color = colors[(i-1) % len(colors)]
-            
-            # Create simple, visual course information
-            if "Prep Course" in item['course'] or "8-Week" in item['course']:
-                benefit_title = "Foundation Building"
-                benefit_desc = "Build core skills step-by-step"
-                visual_benefit = "📈 Score boost: +50-100 points"
-                icon = "🏗️"
-            elif "Math" in item['course']:
-                benefit_title = "Mathematics Mastery" 
-                benefit_desc = "Master algebra, geometry & data analysis"
-                visual_benefit = "🎯 Math section: +40-80 points"
-                icon = "🔢"
-            elif "Reading" in item['course'] or "Writing" in item['course'] or "ELA" in item['course']:
-                benefit_title = "Language Excellence"
-                benefit_desc = "Perfect reading & writing skills"
-                visual_benefit = "✍️ Language score: +30-60 points"
-                icon = "📚"
-            elif "Bootcamp" in item['course']:
-                benefit_title = "Intensive Boost"
-                benefit_desc = "Rapid skill improvement in focused areas"
-                visual_benefit = "⚡ Quick results in 1-2 weeks"
-                icon = "🚀"
-            elif "Review" in item['course']:
-                benefit_title = "Final Polish"
-                benefit_desc = "Perfect your test-taking confidence"
-                visual_benefit = "🏆 Test-day confidence boost"
-                icon = "🎯"
+            if 'Weekly Practice' in course_type or 'Final Practice' in course_type:
+                if 'onwards' in week_range or 'Final' in week_range:
+                    practice_weeks.append(f"🏃‍♂️ Practice tests throughout")
+                else:
+                    practice_weeks.append(f"🏃‍♂️ {week_range}: Practice tests")
             else:
-                benefit_title = "Skill Enhancement"
-                benefit_desc = "Targeted improvement for better scores"
-                visual_benefit = "📊 Strategic score gains"
-                icon = "⭐"
-            
-            # Create roadmap-style course card with native Streamlit components
-            with st.container():
-                # Step header with visual emphasis
-                col1, col2, col3 = st.columns([1, 3, 1])
-                with col2:
-                    st.info(f"**🎯 STEP {i}**")
-                
-                # Course visual header  
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    st.markdown(f"### {icon}")
-                    st.markdown(f"## {benefit_title}")
-                    st.markdown(f"### {item['course']}")
-                    st.caption(f"{item.get('suggested_timing', item['weeks'])} • {item['focus']}")
-                
-                # Add visual separation
-                st.markdown("---")
-                
-                # Goal and benefit boxes - more prominent
-                col1, col2 = st.columns([1, 1])
+                timeline_data.append({
+                    'weeks': week_range,
+                    'course': item['course'],
+                    'type': course_type,
+                    'focus': item['focus'],
+                    'icon': item['icon']
+                })
+        
+        # Display timeline in a structured way
+        if timeline_data:
+            for i, item in enumerate(timeline_data, 1):
+                col1, col2 = st.columns([1, 4])
                 with col1:
-                    st.success(f"🎯 **Goal:** {benefit_desc}")
+                    st.markdown(f"**Step {i}**")
+                    st.caption(item['weeks'])
                 with col2:
-                    st.success(f"{visual_benefit}")
-                
-                # Course schedule display with visual boxes
-                if times:
-                    st.markdown("### 📅 Choose Your Class Schedule")
-                    st.caption("Pick a time that works for you:")
+                    course_type_color = {
+                        'Primary Course': '🟢',
+                        'Subject Focus': '🔵', 
+                        'Intensive Session': '🟡',
+                        'Final Review': '🔴'
+                    }.get(item['type'], '⚪')
                     
-                    # Display time slots with better visual grouping
-                    for i_time in range(0, min(len(times), 4)):  # Show up to 4 times vertically
-                        time_slot = times[i_time]
-                        if ':' in time_slot and '@' in time_slot:
-                            parts = time_slot.split('@')
-                            date_range = parts[0].strip()
-                            time_part = parts[1].strip() if len(parts) > 1 else ""
-                            st.info(f"🗓️ **{date_range}** • 🕐 **{time_part}**")
-                        else:
-                            st.info(f"🗓️ **{time_slot}**")
-                    
-                    if len(times) > 4:
-                        st.caption(f"➕ {len(times) - 4} more schedules available")
+                    st.markdown(f"{course_type_color} **{item['icon']} {item['course']}**")
+                    st.caption(f"Focus: {item['focus']} • Type: {item['type']}")
                 
-                # Visual step completion separator
-                st.markdown("---")
-                st.markdown("")  # Add spacing
-            
-            # Enrollment button outside the card
-            if course_info and course_info.get('url'):
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    st.link_button(
-                        f"Enroll in step {i}",
-                        course_info['url'],
-                        help=f"Begin your {benefit_title.lower()} journey",
-                        use_container_width=True,
-                        type="primary"
-                    )
-            
-            # Visual navigation to next step
-            if i < len(suggested_sequence):
-                # Simple visual arrow
-                col1, col2, col3 = st.columns([2, 1, 2])
-                with col2:
-                    st.markdown("### ⬇️")
-                    st.caption("Next step")
-                st.markdown("")  # Add spacing
+                if i < len(timeline_data):
+                    st.markdown("↓")
         
-        # Final Success Destination with maximum visual impact
-        st.markdown("---")
+        # Display practice schedule
+        if practice_weeks:
+            st.info("**🏃‍♂️ Practice Schedule:** " + " • ".join(practice_weeks))
+        
         st.markdown("---")
         
-        # Visual arrow to destination
-        col1, col2, col3 = st.columns([2, 1, 2])
-        with col2:
-            st.markdown("### ⬇️")
-            st.caption("Your destination")
+        # Detailed course information
+        st.markdown("#### 📚 Course Details & Enrollment")
+        st.caption("Click any course below to see schedules and enroll")
         
-        # Visual success destination
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col2:
-            st.markdown("### 🏆")
-            st.success("**SAT Success!**")
+        # Group courses by type for better organization
+        course_types = {
+            'Foundation Courses': [],
+            'Subject-Focused Courses': [],
+            'Intensive Sessions': [],
+            'Practice & Review': []
+        }
         
-        # Visual achievement cards
-        col1, col2, col3 = st.columns([1, 1, 1])
-        
-        with col1:
-            st.success("### 📊\n**1400+ Score**\n+100-200 points")
-        
-        with col2:
-            st.success("### 🧠\n**Skills Mastered**\nMath + Language")
-        
-        with col3:
-            st.success("### 🎓\n**Future Ready**\nCollege bound")
-        
-        # Major visual separator before "All Options"
-        st.markdown("---")
-        st.markdown("---")
-        st.markdown("---")
-        
-        # Visual section header for all options
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("### 📚 More class options")
-            st.caption("Browse all available schedules")
-        
-    else:
-        # If no personalized sequence, show tip
-        st.info("**Tip:** Enable schedule filtering above to see a personalized class sequence recommendation")
-        
-        # Still show section separator for all options
-        st.markdown("---")
-        st.markdown("### All available course options")
-        st.markdown("*Review all available times and dates for each course*")
-    
-    # All Available Classes section with visual distinction
-    st.markdown("---")  # Add clear separation
-    st.markdown("")  # Add spacing
-    
-    for step_number, item in enumerate(schedule, 1):
-        # Create course card
-        course_info = COURSE_CATALOG.get(item['course'], {})
-        course_desc = course_info.get('description', 'Complete your SAT preparation with this essential course.')
-        available_times = course_info.get('available_times', [])
-        
-        # Create visual course card for browsing with error handling
-        icon = item.get('icon', '📚')
-        course_name = item.get('course', 'Course')
-        
-        with st.expander(f"{icon} **{course_name}** ({len(available_times)} times available)", expanded=False):
-            # Simple course overview
-            col1, col2 = st.columns([3, 1])
-            
-            with col1:
-                weeks = item.get('weeks', 'Duration TBD')
-                focus = item.get('focus', 'SAT Preparation') 
-                st.success(f"⏱️ **{weeks}** • 🎯 **{focus}**")
-            
-            with col2:
-                # Enrollment CTA at the top
-                if course_info and course_info.get('url'):
-                    st.link_button(
-                        "View & enroll",
-                        course_info['url'],
-                        use_container_width=True,
-                        type="primary"
-                    )
-            
-            # Show first few times only to avoid overwhelming
-            if available_times:
-                st.markdown("**📅 Available schedules:**")
-                
-                # Show max 4 times for quick scanning
-                for i in range(0, min(len(available_times), 4), 2):
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.info(f"🗓️ {available_times[i]}")
-                    
-                    if i + 1 < len(available_times):
-                        with col2:
-                            st.info(f"🗓️ {available_times[i + 1]}")
-                
-                if len(available_times) > 4:
-                    st.caption(f"➕ {len(available_times) - 4} more schedules available")
+        for item in suggested:
+            course_type = item.get('type', 'Course')
+            if course_type == 'Primary Course':
+                course_types['Foundation Courses'].append(item)
+            elif course_type == 'Subject Focus':
+                course_types['Subject-Focused Courses'].append(item)
+            elif course_type == 'Intensive Session':
+                course_types['Intensive Sessions'].append(item)
             else:
-                st.warning("📞 Contact for schedule options")
+                course_types['Practice & Review'].append(item)
         
-        # Add spacing between course cards
-        st.markdown("")
-    
-    # Visual closing section
-    st.markdown("---")
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col1:
-        st.success("### 📞\n**Need help?**\n(800) 803-4058")
-    with col2:
-        st.info("### 🎯\n**Your plan**\nStep-by-step success")
-    with col3:
-        st.warning("### ⏰\n**Ready to start?**\nPick your classes!")
-    
-    # Show filtered out classes if any
-    if st.session_state.availability['filter_enabled']:
-        try:
-            if 'filtered_out_classes' in locals() and filtered_out_classes:
-                with st.expander(f"Classes not matching your schedule ({len(filtered_out_classes)} hidden)", expanded=False):
-                    st.markdown("**The following classes were filtered out based on your availability preferences:**")
-                    st.markdown("*You can adjust your availability settings on the previous page if you're interested in any of these.*")
+        for category, items in course_types.items():
+            if items:
+                st.markdown(f"**{category}**")
+                for item in items:
+                    info = COURSE_CATALOG.get(item['course'], {})
                     
-                    for filtered_class in filtered_out_classes:
-                        item = filtered_class['item']
-                        reason = filtered_class['reason']
-                        times = filtered_class['times']
-                        
-                        # Create a card for each filtered class
-                        st.markdown("---")
-                        
+                    expander_title = f"{item['icon']} {item['course']} ({item['week_range']})"
+                    with st.expander(expander_title):
                         col1, col2 = st.columns([3, 1])
                         
                         with col1:
-                            filtered_icon = item.get('icon', '📚')
-                            filtered_course = item.get('course', 'Course')
-                            filtered_focus = item.get('focus', 'SAT Prep')
-                            filtered_weeks = item.get('weeks', 'Duration TBD')
-                            st.markdown(f"**{filtered_icon} {filtered_course}**")
-                            st.markdown(f"*{filtered_focus} • {filtered_weeks}*")
+                            st.markdown(f"**{item['focus']}**")
+                            if info.get('description'):
+                                st.markdown(info['description'])
                             
-                            # Show why it was filtered
-                            st.markdown(f"🚫 **Filtered because:** {reason}")
-                            
-                            # Show sample class times
-                            if times:
-                                st.markdown("⏰ **Sample times:**")
-                                for time in times:
-                                    st.markdown(f"   • {time}")
-                                if len(times) == 3 and len(COURSE_CATALOG.get(item['course'], {}).get('available_times', [])) > 3:
-                                    st.markdown("   • *...and more times available*")
+                            if item.get('available_times'):
+                                st.markdown("**📅 Available times that match your schedule:**")
+                                for t in item['available_times'][:3]:
+                                    if '@' in t:
+                                        date_part, time_part = t.split('@', 1)
+                                        st.success(f"🗓️ **{date_part.strip()}** at **{time_part.strip()}**")
+                                    else:
+                                        st.success(f"🗓️ **{t}**")
+                                
+                                if len(item['available_times']) > 3:
+                                    st.caption(f"Plus {len(item['available_times']) - 3} more time options")
                         
                         with col2:
-                            course_info = COURSE_CATALOG.get(item['course'], {})
-                            if course_info and course_info.get('url'):
-                                st.markdown(f"""
-                                <a href="{course_info['url']}" target="_blank" 
-                                   style="background: #6b7280; color: white; padding: 10px 15px; 
-                                          border-radius: 8px; text-decoration: none; font-size: 0.9em; 
-                                          display: inline-block; text-align: center;">
-                                   View All Times
-                                </a>
-                                """, unsafe_allow_html=True)
-                    
-                    st.markdown("---")
-                    st.markdown("**Tip:** Go back to step 1 to adjust your availability and see more class options")
-        except NameError:
-            # filtered_out_classes not defined, which means no filtering occurred
-            pass
-    
-    # Navigation back to step 1
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("← Back to quick set up", key="back_to_step1", use_container_width=True):
+                            # Course timing info
+                            course_type = item.get('type', 'Course')
+                            if 'Practice' in course_type:
+                                st.warning("**Practice**\nOngoing")
+                            elif 'Primary' in course_type:
+                                st.info("**Foundation**\nCore prep")
+                            elif 'Subject' in course_type:
+                                st.success("**Subject Focus**\nSpecialized")
+                            elif 'Intensive' in course_type:
+                                st.error("**Intensive**\nHigh impact")
+                            else:
+                                st.info("**Review**\nFinal prep")
+                        
+                        if info.get('url'):
+                            st.link_button("🎯 View details & enroll", info['url'], use_container_width=True, type="primary")
+                
+                st.markdown("")
+        
+        # Summary and next steps
+        st.markdown("#### 🎯 Your Preparation Summary")
+        col1, col2, col3, col4 = st.columns(4)
+        
+        total_courses = len([s for s in suggested if 'Practice' not in s.get('type', '')])
+        practice_sessions = len([s for s in suggested if 'Practice' in s.get('type', '')])
+        foundation_courses = len([s for s in suggested if 'Primary' in s.get('type', '')])
+        specialized_courses = len([s for s in suggested if 'Subject' in s.get('type', '') or 'Intensive' in s.get('type', '')])
+        
+        with col1:
+            st.metric("📚 Main Courses", total_courses)
+        with col2:
+            st.metric("🏃‍♂️ Practice Sessions", practice_sessions)
+        with col3:
+            st.metric("🏗️ Foundation", foundation_courses)
+        with col4:
+            st.metric("🎯 Specialized", specialized_courses)
+        
+        # Action plan
+        st.success(f"""
+        **🚀 Your Action Plan:**
+        1. **Start with foundation courses** ({foundation_courses} course{'s' if foundation_courses != 1 else ''}) for core skills
+        2. **Add weekly practice tests** throughout your preparation
+        3. **Focus on weak areas** with specialized courses ({specialized_courses} available)
+        4. **Take practice tests** regularly to track progress
+        5. **Complete final review** in the weeks before your test
+        """)
+        
+        st.markdown("---")
+
+    # All recommended classes
+    st.markdown("### 📚 All recommended classes")
+    st.caption("Expand a class to see schedules and enroll.")
+    st.markdown("")
+
+    for item in schedule:
+        info = COURSE_CATALOG.get(item['course'], {})
+        times = info.get('available_times', [])
+        
+        # Create explicit expander title
+        course_icon = item.get('icon','📚')
+        course_name = item['course']
+        course_focus = item['focus']
+        expander_title = f"{course_icon} {course_name} · {course_focus}"
+        with st.expander(expander_title):
+            st.success(f"⏱️ **{item['weeks']}** • 🎯 **{item['focus']}**")
+            if info.get('description'):
+                st.markdown(info['description'])
+            if times:
+                st.markdown("**📅 Available schedules:**")
+                for t in times[:4]:
+                    st.info(f"🗓️ {t}")
+                remaining = max(len(times)-4, 0)
+                if remaining:
+                    st.caption(f"➕ {remaining} more schedules available")
+            else:
+                st.warning("Contact us for schedule options.")
+            if info.get('url'):
+                st.link_button("View & enroll", info['url'], use_container_width=True, type="primary")
+        st.markdown("")
+
+    # Hidden by filters
+    if av['filter_enabled'] and filtered_out:
+        # Create explicit expander title for filtered courses
+        num_filtered = len(filtered_out)
+        filtered_title = f"Hidden by your filters ({num_filtered})"
+        with st.expander(filtered_title):
+            st.caption("Adjust schedule preferences on Step 1 to include these.")
+            for fc in filtered_out:
+                it = fc['item']; times = fc['times']
+                st.markdown(f"**{it.get('icon','📚')} {it['course']}** — {it.get('focus','')}")
+                st.markdown("🚫 **Reason:** Doesn't match your day/time preferences")
+                if times:
+                    st.markdown("⏰ Sample times:")
+                    for t in times:
+                        st.markdown(f"• {t}")
+
+    st.markdown("---")
+    cols = st.columns([1,1,1])
+    with cols[0]:
+        if st.button("← Back to quick setup", use_container_width=True):
             st.session_state.step = 1
             st.rerun()
+    with cols[1]:
+        st.info("### 📞\n**Questions?**\n(800) 803-4058")
+    with cols[2]:
+        st.success("### ✅\n**Next step**\nEnroll in a class")
 
-# Action Bar (simplified native version)
-if st.session_state.step == 2:
-    st.markdown("---")
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        st.markdown(f"**Test Date:** {st.session_state.test_date}")
-        if 'timeline_text' in locals():
-            st.markdown(f"**Timeline:** {timeline_text}")
-    with col2:
-        st.markdown("📞 **Questions? Call (800) 803-4058**")
-
-# Footer
 st.markdown("---")
-st.markdown("**SAT Class Finder** - Connecting students with Varsity Tutors SAT preparation classes") 
+st.markdown("**SAT Class Finder** • Connecting students with Varsity Tutors SAT preparation classes")
