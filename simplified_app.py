@@ -389,6 +389,104 @@ def matches_availability(course_times, selected_days, selected_times):
     
     return False
 
+def get_filter_reason(course_times, selected_days, selected_times):
+    """
+    Get the specific reason why a course was filtered out
+    """
+    if not selected_days and not selected_times:
+        return "No filters applied"
+    
+    day_mapping = {
+        'Monday': 'Mon', 'Tuesday': 'Tue', 'Wednesday': 'Wed', 
+        'Thursday': 'Thu', 'Friday': 'Fri', 'Saturday': 'Sat', 'Sunday': 'Sun'
+    }
+    
+    # Analyze what conflicts exist
+    day_conflicts = []
+    time_conflicts = []
+    
+    # Check each time slot for conflicts
+    for time_slot in course_times:
+        time_lower = time_slot.lower()
+        
+        # Check day conflicts
+        if selected_days:
+            day_found = False
+            for day in selected_days:
+                short_day = day_mapping.get(day, day[:3].lower())
+                if short_day.lower() in time_lower:
+                    day_found = True
+                    break
+            if not day_found:
+                # Find which day this class is on
+                for full_day, short in day_mapping.items():
+                    if short.lower() in time_lower:
+                        day_conflicts.append(full_day)
+                        break
+        
+        # Check time conflicts  
+        if selected_times:
+            time_found = False
+            for time_period in selected_times:
+                if time_period == "Morning" and any(hour in time_slot for hour in ["10:00 AM", "11:00 AM", "12:00 PM"]):
+                    time_found = True
+                elif time_period == "Early Afternoon" and any(hour in time_slot for hour in ["12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM"]):
+                    time_found = True
+                elif time_period == "Late Afternoon" and any(hour in time_slot for hour in ["3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"]):
+                    time_found = True
+                elif time_period == "Evening" and any(hour in time_slot for hour in ["6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM"]):
+                    time_found = True
+                elif time_period == "Night" and any(hour in time_slot for hour in ["9:00 PM", "10:00 PM", "11:00 PM"]):
+                    time_found = True
+            
+            if not time_found:
+                # Determine what time period this class falls into
+                if any(hour in time_slot for hour in ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM"]):
+                    time_conflicts.append("Morning")
+                elif any(hour in time_slot for hour in ["12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM"]):
+                    time_conflicts.append("Early Afternoon")
+                elif any(hour in time_slot for hour in ["3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"]):
+                    time_conflicts.append("Late Afternoon")
+                elif any(hour in time_slot for hour in ["6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM"]):
+                    time_conflicts.append("Evening")
+                elif any(hour in time_slot for hour in ["9:00 PM", "10:00 PM", "11:00 PM"]):
+                    time_conflicts.append("Night")
+    
+    # Build reason string
+    reasons = []
+    if day_conflicts:
+        unique_days = list(set(day_conflicts))
+        reasons.append(f"Scheduled on {', '.join(unique_days)}")
+    if time_conflicts:
+        unique_times = list(set(time_conflicts))
+        reasons.append(f"During {', '.join(unique_times)} time slots")
+    
+    return " • ".join(reasons) if reasons else "Schedule conflict"
+
+def filter_schedule_with_tracking(original_schedule, selected_days, selected_times):
+    """
+    Filter schedule and track what gets filtered out with reasons
+    """
+    filtered_schedule = []
+    filtered_out = []
+    
+    for item in original_schedule:
+        course_info = COURSE_CATALOG.get(item['course'], {})
+        course_times = course_info.get('available_times', [])
+        
+        if matches_availability(course_times, selected_days, selected_times):
+            filtered_schedule.append(item)
+        else:
+            # Track what was filtered out and why
+            reason = get_filter_reason(course_times, selected_days, selected_times)
+            filtered_out.append({
+                'item': item,
+                'reason': reason,
+                'times': course_times[:3] if len(course_times) > 3 else course_times  # Show first 3 times
+            })
+    
+    return filtered_schedule, filtered_out
+
 # Progress indicator
 progress_labels = ["Choose Test Date", "Select Your Availability", "Your SAT Prep Journey"]
 progress = st.session_state.step / len(progress_labels)
@@ -738,14 +836,12 @@ elif st.session_state.step == 3:
             {"weeks": "Ongoing", "course": "Proctored Practice SAT", "focus": "Test Practice", "icon": "📝"}
         ]
         
-        # Filter schedule based on availability
+        # Filter schedule based on availability  
+        filtered_out_classes = []
         if st.session_state.availability['days'] or st.session_state.availability['times']:
-            filtered_schedule = []
-            for item in schedule:
-                course_info = COURSE_CATALOG.get(item['course'], {})
-                course_times = course_info.get('available_times', [])
-                if matches_availability(course_times, st.session_state.availability['days'], st.session_state.availability['times']):
-                    filtered_schedule.append(item)
+            filtered_schedule, filtered_out_classes = filter_schedule_with_tracking(
+                schedule, st.session_state.availability['days'], st.session_state.availability['times']
+            )
             schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
         
     elif days_until > 28:
@@ -769,14 +865,14 @@ elif st.session_state.step == 3:
         ]
         
         # Filter schedule based on availability
+        if not 'filtered_out_classes' in locals():
+            filtered_out_classes = []
         if st.session_state.availability['days'] or st.session_state.availability['times']:
-            filtered_schedule = []
-            for item in schedule:
-                course_info = COURSE_CATALOG.get(item['course'], {})
-                course_times = course_info.get('available_times', [])
-                if matches_availability(course_times, st.session_state.availability['days'], st.session_state.availability['times']):
-                    filtered_schedule.append(item)
+            filtered_schedule, additional_filtered_out = filter_schedule_with_tracking(
+                schedule, st.session_state.availability['days'], st.session_state.availability['times']
+            )
             schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
+            filtered_out_classes.extend(additional_filtered_out)
         
     else:
         timeline_status = "urgent"
@@ -799,14 +895,14 @@ elif st.session_state.step == 3:
         ]
         
         # Filter schedule based on availability
+        if not 'filtered_out_classes' in locals():
+            filtered_out_classes = []
         if st.session_state.availability['days'] or st.session_state.availability['times']:
-            filtered_schedule = []
-            for item in schedule:
-                course_info = COURSE_CATALOG.get(item['course'], {})
-                course_times = course_info.get('available_times', [])
-                if matches_availability(course_times, st.session_state.availability['days'], st.session_state.availability['times']):
-                    filtered_schedule.append(item)
+            filtered_schedule, additional_filtered_out = filter_schedule_with_tracking(
+                schedule, st.session_state.availability['days'], st.session_state.availability['times']
+            )
             schedule = filtered_schedule if filtered_schedule else schedule  # Keep original if no matches
+            filtered_out_classes.extend(additional_filtered_out)
     
     # Show availability filtering info
     if st.session_state.availability['days'] or st.session_state.availability['times']:
@@ -945,6 +1041,58 @@ elif st.session_state.step == 3:
     that keeps you engaged all the way to test day!
     """)
     st.info("📞 **Questions? Call Varsity Tutors: (800) 803-4058**")
+    
+    # Show filtered out classes if any
+    if st.session_state.availability['days'] or st.session_state.availability['times']:
+        try:
+            if 'filtered_out_classes' in locals() and filtered_out_classes:
+                with st.expander(f"📋 Classes Not Matching Your Schedule ({len(filtered_out_classes)} hidden)", expanded=False):
+                    st.markdown("**The following classes were filtered out based on your availability preferences:**")
+                    st.markdown("*You can adjust your availability settings on the previous page if you're interested in any of these.*")
+                    
+                    for filtered_class in filtered_out_classes:
+                        item = filtered_class['item']
+                        reason = filtered_class['reason']
+                        times = filtered_class['times']
+                        
+                        # Create a card for each filtered class
+                        st.markdown("---")
+                        
+                        col1, col2 = st.columns([3, 1])
+                        
+                        with col1:
+                            st.markdown(f"**{item['icon']} {item['course']}**")
+                            st.markdown(f"*{item['focus']} • {item['weeks']}*")
+                            
+                            # Show why it was filtered
+                            st.markdown(f"🚫 **Filtered because:** {reason}")
+                            
+                            # Show sample class times
+                            if times:
+                                st.markdown("⏰ **Sample times:**")
+                                for time in times:
+                                    st.markdown(f"   • {time}")
+                                if len(times) == 3 and len(COURSE_CATALOG.get(item['course'], {}).get('available_times', [])) > 3:
+                                    st.markdown("   • *...and more times available*")
+                        
+                        with col2:
+                            course_info = COURSE_CATALOG.get(item['course'], {})
+                            if course_info and course_info.get('url'):
+                                st.markdown(f"""
+                                <a href="{course_info['url']}" target="_blank" 
+                                   style="background: #6b7280; color: white; padding: 10px 15px; 
+                                          border-radius: 8px; text-decoration: none; font-size: 0.9em; 
+                                          display: inline-block; text-align: center;">
+                                   View All Times
+                                </a>
+                                """, unsafe_allow_html=True)
+                    
+                    st.markdown("---")
+                    st.markdown("💡 **Tip:** Go back to Step 2 to adjust your availability and see more class options!")
+        except NameError:
+            # filtered_out_classes not defined, which means no filtering occurred
+            pass
+    
     # Navigation back to step 1
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
