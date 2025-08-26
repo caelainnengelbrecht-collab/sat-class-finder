@@ -58,54 +58,22 @@ p,li{font-size:var(--body);color:var(--ink-muted)}
 .stSuccess{background:var(--success-50)!important;border-left:4px solid var(--success-500)!important;border-radius:12px!important}
 .stWarning{background:var(--warning-50)!important;border-left:4px solid var(--warning-500)!important;border-radius:12px!important}
 
-/* Expanders — fix overlap & stray markers */
-.streamlit-expanderHeader::before,
-.streamlit-expanderHeader::after { content: none !important; }
-details > summary { list-style: none; }
-details > summary::-webkit-details-marker { display: none; }
+/* Custom collapsible sections */
 
-.streamlit-expanderHeader{
-  display:flex!important; align-items:center!important; gap:.5rem!important;
-  white-space:normal!important; overflow:hidden!important; text-overflow:ellipsis!important;
-  line-height:1.4!important; min-height:48px; font-weight:700; 
-  padding:.75rem 1rem!important; margin:.5rem 0!important;
-}
-.streamlit-expanderHeader *{min-width:0}
 
-/* Hide the "key" text that Streamlit adds internally */
-.streamlit-expanderHeader span[data-testid]:first-child {
-  display: none !important;
-}
-.streamlit-expanderHeader > span:first-child:not([class]) {
-  display: none !important;
-}
-/* Alternative approach - hide any text that starts with "key" */
-.streamlit-expanderHeader span:first-child {
-  font-size: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
 
-/* Clean expander spacing */
-div[data-testid="stExpander"] {
-  margin: 0.75rem 0 !important;
-  clear: both !important;
-}
-div[data-testid="stExpander"] > div:first-child {
-  margin-bottom: 0.5rem !important;
-}
-/* Prevent text overlap and ensure proper positioning */
-.streamlit-expanderHeader * {
-  vertical-align: baseline !important;
-  line-height: inherit !important;
-  display: inline !important;
-}
-/* Force proper text flow */
-.streamlit-expanderHeader {
+
+/* Custom button styling for collapsible sections */
+.stButton > button {
   text-align: left !important;
-  word-wrap: break-word !important;
+  width: 100% !important;
 }
+
+/* Clean container spacing */
+.stContainer {
+  margin: 0.5rem 0 !important;
+}
+
 /* Additional spacing for all Streamlit containers */
 .element-container {
   margin-bottom: 0.75rem !important;
@@ -749,46 +717,59 @@ else:
         for category, items in course_types.items():
             if items:
                 st.markdown(f"**{category}**")
-                for item in items:
+                for idx, item in enumerate(items):
                     info = COURSE_CATALOG.get(item['course'], {})
                     
-                    expander_title = f"{item['icon']} {item['course']} ({item['week_range']})"
-                    with st.expander(expander_title):
-                        col1, col2 = st.columns([3, 1])
-                        
-                        with col1:
-                            st.markdown(f"**{item['focus']}**")
-                            if info.get('description'):
-                                st.markdown(info['description'])
+                    # Create custom collapsible section with unique index
+                    clean_category = category.replace(' ', '_').replace('&', 'and')
+                    clean_course = item['course'].replace(' ', '_').replace('-', '_').replace('&', 'and')
+                    course_key = f"details_{clean_category}_{clean_course}_{idx}"
+                    if course_key not in st.session_state:
+                        st.session_state[course_key] = False
+                    
+                    # Custom header button
+                    button_text = f"{item['icon']} {item['course']} ({item['week_range']})"
+                    if st.button(button_text, key=f"btn_{course_key}", use_container_width=True):
+                        st.session_state[course_key] = not st.session_state[course_key]
+                    
+                    # Show content if expanded
+                    if st.session_state[course_key]:
+                        with st.container():
+                            col1, col2 = st.columns([3, 1])
                             
-                            if item.get('available_times'):
-                                st.markdown("**📅 Available times that match your schedule:**")
-                                for t in item['available_times'][:3]:
-                                    if '@' in t:
-                                        date_part, time_part = t.split('@', 1)
-                                        st.success(f"🗓️ **{date_part.strip()}** at **{time_part.strip()}**")
-                                    else:
-                                        st.success(f"🗓️ **{t}**")
+                            with col1:
+                                st.markdown(f"**{item['focus']}**")
+                                if info.get('description'):
+                                    st.markdown(info['description'])
                                 
-                                if len(item['available_times']) > 3:
-                                    st.caption(f"Plus {len(item['available_times']) - 3} more time options")
-                        
-                        with col2:
-                            # Course timing info
-                            course_type = item.get('type', 'Course')
-                            if 'Practice' in course_type:
-                                st.warning("**Practice**\nOngoing")
-                            elif 'Primary' in course_type:
-                                st.info("**Foundation**\nCore prep")
-                            elif 'Subject' in course_type:
-                                st.success("**Subject Focus**\nSpecialized")
-                            elif 'Intensive' in course_type:
-                                st.error("**Intensive**\nHigh impact")
-                            else:
-                                st.info("**Review**\nFinal prep")
-                        
-                        if info.get('url'):
-                            st.link_button("🎯 View details & enroll", info['url'], use_container_width=True, type="primary")
+                                if item.get('available_times'):
+                                    st.markdown("**📅 Available times that match your schedule:**")
+                                    for t in item['available_times'][:3]:
+                                        if '@' in t:
+                                            date_part, time_part = t.split('@', 1)
+                                            st.success(f"🗓️ **{date_part.strip()}** at **{time_part.strip()}**")
+                                        else:
+                                            st.success(f"🗓️ **{t}**")
+                                    
+                                    if len(item['available_times']) > 3:
+                                        st.caption(f"Plus {len(item['available_times']) - 3} more time options")
+                            
+                            with col2:
+                                # Course timing info
+                                course_type = item.get('type', 'Course')
+                                if 'Practice' in course_type:
+                                    st.warning("**Practice**\nOngoing")
+                                elif 'Primary' in course_type:
+                                    st.info("**Foundation**\nCore prep")
+                                elif 'Subject' in course_type:
+                                    st.success("**Subject Focus**\nSpecialized")
+                                elif 'Intensive' in course_type:
+                                    st.error("**Intensive**\nHigh impact")
+                                else:
+                                    st.info("**Review**\nFinal prep")
+                            
+                            if info.get('url'):
+                                st.link_button("🎯 View details & enroll", info['url'], use_container_width=True, type="primary")
                 
                 st.markdown("")
         
@@ -827,7 +808,7 @@ else:
     st.caption("Expand a class to see schedules and enroll.")
     st.markdown("")
 
-    for item in schedule:
+    for idx, item in enumerate(schedule):
         info = COURSE_CATALOG.get(item['course'], {})
         times = info.get('available_times', [])
         
@@ -835,39 +816,61 @@ else:
         course_icon = item.get('icon','📚')
         course_name = item['course']
         course_focus = item['focus']
-        expander_title = f"{course_icon} {course_name} · {course_focus}"
-        with st.expander(expander_title):
-            st.success(f"⏱️ **{item['weeks']}** • 🎯 **{item['focus']}**")
-            if info.get('description'):
-                st.markdown(info['description'])
-            if times:
-                st.markdown("**📅 Available schedules:**")
-                for t in times[:4]:
-                    st.info(f"🗓️ {t}")
-                remaining = max(len(times)-4, 0)
-                if remaining:
-                    st.caption(f"➕ {remaining} more schedules available")
-            else:
-                st.warning("Contact us for schedule options.")
-            if info.get('url'):
-                st.link_button("View & enroll", info['url'], use_container_width=True, type="primary")
+        # Create custom collapsible section for all recommended classes
+        clean_course_name = course_name.replace(' ', '_').replace('-', '_').replace('&', 'and')
+        rec_course_key = f"all_recommended_{clean_course_name}_{idx}"
+        if rec_course_key not in st.session_state:
+            st.session_state[rec_course_key] = False
+        
+        # Custom header button
+        button_text = f"{course_icon} {course_name} · {course_focus}"
+        if st.button(button_text, key=f"btn_{rec_course_key}", use_container_width=True):
+            st.session_state[rec_course_key] = not st.session_state[rec_course_key]
+        
+        # Show content if expanded
+        if st.session_state[rec_course_key]:
+            with st.container():
+                st.success(f"⏱️ **{item['weeks']}** • 🎯 **{item['focus']}**")
+                if info.get('description'):
+                    st.markdown(info['description'])
+                if times:
+                    st.markdown("**📅 Available schedules:**")
+                    for t in times[:4]:
+                        st.info(f"🗓️ {t}")
+                    remaining = max(len(times)-4, 0)
+                    if remaining:
+                        st.caption(f"➕ {remaining} more schedules available")
+                else:
+                    st.warning("Contact us for schedule options.")
+                if info.get('url'):
+                    st.link_button("View & enroll", info['url'], use_container_width=True, type="primary")
         st.markdown("")
 
     # Hidden by filters
     if av['filter_enabled'] and filtered_out:
-        # Create explicit expander title for filtered courses
+        # Create custom collapsible section for filtered courses
         num_filtered = len(filtered_out)
-        filtered_title = f"Hidden by your filters ({num_filtered})"
-        with st.expander(filtered_title):
-            st.caption("Adjust schedule preferences on Step 1 to include these.")
-            for fc in filtered_out:
-                it = fc['item']; times = fc['times']
-                st.markdown(f"**{it.get('icon','📚')} {it['course']}** — {it.get('focus','')}")
-                st.markdown("🚫 **Reason:** Doesn't match your day/time preferences")
-                if times:
-                    st.markdown("⏰ Sample times:")
-                    for t in times:
-                        st.markdown(f"• {t}")
+        filtered_key = "show_filtered_courses"
+        if filtered_key not in st.session_state:
+            st.session_state[filtered_key] = False
+        
+        # Custom header button
+        button_text = f"🚫 Hidden by your filters ({num_filtered})"
+        if st.button(button_text, key="btn_filtered_courses_section", use_container_width=True):
+            st.session_state[filtered_key] = not st.session_state[filtered_key]
+        
+        # Show content if expanded
+        if st.session_state[filtered_key]:
+            with st.container():
+                st.caption("Adjust schedule preferences on Step 1 to include these.")
+                for fc in filtered_out:
+                    it = fc['item']; times = fc['times']
+                    st.markdown(f"**{it.get('icon','📚')} {it['course']}** — {it.get('focus','')}")
+                    st.markdown("🚫 **Reason:** Doesn't match your day/time preferences")
+                    if times:
+                        st.markdown("⏰ Sample times:")
+                        for t in times:
+                            st.markdown(f"• {t}")
 
     st.markdown("---")
     cols = st.columns([1,1,1])
