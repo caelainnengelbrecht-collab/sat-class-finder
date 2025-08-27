@@ -15,15 +15,15 @@ st.markdown(
     """
 <style>
 :root {
-  /* Base */
-  --bg:#f8fafc; --surface:#ffffff; --ink:#0f172a; --ink-muted:#475569; --border:#e2e8f0;
+  /* Base - Dark Theme */
+  --bg:#0f1419; --surface:#1e293b; --ink:#f1f5f9; --ink-muted:#94a3b8; --border:#334155;
   /* Brand */
-  --brand-50:#eff6ff; --brand-100:#dbeafe; --brand-200:#bfdbfe; --brand-300:#93c5fd; --brand-400:#60a5fa;
+  --brand-50:#1e293b; --brand-100:#334155; --brand-200:#475569; --brand-300:#64748b; --brand-400:#60a5fa;
   --brand-500:#3b82f6; --brand-600:#2563eb; --brand-700:#1d4ed8; --brand-800:#1e40af; --brand-900:#1e3a8a;
   /* Semantic */
-  --success-50:#f0fdf4; --success-500:#22c55e; --warning-50:#fffbeb; --warning-500:#f59e0b; --danger-50:#fef2f2; --danger-500:#ef4444;
+  --success-50:#1e293b; --success-500:#22c55e; --warning-50:#1e293b; --warning-500:#f59e0b; --danger-50:#1e293b; --danger-500:#ef4444;
   /* Tokens */
-  --radius-sm:.5rem; --radius-lg:1rem; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 6px 16px rgba(15,23,42,.08);
+  --radius-sm:.5rem; --radius-lg:1rem; --shadow-sm:0 4px 8px rgba(0,0,0,.3); --shadow-md:0 8px 24px rgba(0,0,0,.4);
   --h1:clamp(2rem,1.5rem+2vw,2.75rem); --h2:clamp(1.25rem,1rem+1.2vw,1.6rem); --h3:1.125rem; --body:1rem;
 }
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -44,14 +44,19 @@ p,li{font-size:var(--body);color:var(--ink-muted)}
 
 /* Stepper */
 .stepper{display:flex;gap:1rem;justify-content:center;align-items:center;margin:.5rem 0}
-.stepper .step{display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border:1.5px solid var(--border);border-radius:999px;background:#fff}
-.stepper .step.active{border-color:var(--brand-400);box-shadow:0 0 0 3px var(--brand-100)}
+.stepper .step{display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border:1.5px solid var(--border);border-radius:999px;background:var(--surface);color:var(--ink)}
+.stepper .step.active{border-color:var(--brand-400);box-shadow:0 0 0 3px rgba(37,99,235,.2);background:var(--brand-900)}
 .stepper .dot{width:10px;height:10px;border-radius:999px;background:var(--brand-600)}
 
 /* Buttons & Inputs */
 .stButton button{background:var(--brand-600)!important;color:#fff!important;border:none!important;border-radius:12px!important;padding:.9rem 1.2rem!important;font-weight:600!important;font-size:.95rem!important;transition:transform .15s ease,box-shadow .15s ease}
 .stButton button:hover{background:var(--brand-700)!important;transform:translateY(-1px)!important;box-shadow:0 4px 12px rgba(2,132,199,.3)!important}
-.stSelectbox > div > div, .stRadio > div, .stMultiSelect > div > div {border-radius:12px!important;border:2px solid var(--border)!important}
+.stSelectbox > div > div, .stRadio > div, .stMultiSelect > div > div {
+  border-radius:12px!important;
+  border:2px solid var(--border)!important;
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+}
 
 /* Info boxes */
 .stInfo{background:var(--brand-50)!important;border-left:4px solid var(--brand-600)!important;border-radius:12px!important}
@@ -67,21 +72,122 @@ p,li{font-size:var(--body);color:var(--ink-muted)}
 .stButton > button {
   text-align: left !important;
   width: 100% !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
 }
 
-/* Clean container spacing */
+.stButton > button:hover {
+  background: var(--brand-100) !important;
+  border-color: var(--brand-400) !important;
+}
+
+/* Dark theme containers and cards */
 .stContainer {
   margin: 0.5rem 0 !important;
+  background: var(--surface) !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Dark theme for metric cards */
+.metric-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  color: var(--ink) !important;
+}
+
+/* Dark theme for various Streamlit elements */
+div[data-testid="stMetricValue"] {
+  color: var(--ink) !important;
+}
+
+div[data-testid="stMetricLabel"] {
+  color: var(--ink-muted) !important;
+}
+
+.stMarkdown {
+  color: var(--ink) !important;
+}
+
+/* Dark theme for expanders and collapsible content */
+.stExpander {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
 }
 
 /* Additional spacing for all Streamlit containers */
 .element-container {
   margin-bottom: 0.75rem !important;
 }
+
 /* Reasonable heading spacing */
 h1, h2, h3, h4, h5, h6 {
   margin: 1rem 0 0.5rem 0 !important;
   clear: both !important;
+  color: var(--ink) !important;
+}
+
+/* Dark theme for all text elements */
+.stMarkdown p, .stMarkdown li, .stText, .stCaption {
+  color: var(--ink-muted) !important;
+}
+
+/* Dark theme for sidebar */
+.css-1d391kg, .css-1lcbmhc, .css-1y4p8pa {
+  background: var(--bg) !important;
+}
+
+/* Dark theme for main content area */
+.main .block-container {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* Dark theme for text inputs and widgets */
+.stTextInput input, .stTextArea textarea, .stNumberInput input {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+
+/* Dark theme for radio buttons and checkboxes */
+.stRadio label, .stCheckbox label {
+  color: var(--ink) !important;
+}
+
+/* Dark theme for columns */
+.css-ocqkz7 {
+  background: transparent !important;
+}
+
+/* Dark theme for progress bars */
+.stProgress .css-1cpxqw2 {
+  background: var(--surface) !important;
+}
+
+/* Dark theme for tables */
+.stDataFrame {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+/* Override any remaining white backgrounds */
+div[data-testid="stSidebar"] {
+  background: var(--surface) !important;
+}
+
+/* Dark theme for code blocks */
+.stCode, pre {
+  background: var(--brand-900) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
 }
 
 /* Progress */
